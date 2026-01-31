@@ -1,1 +1,1 @@
-<img src="/assets/marimo-modernaicourse-companion-logo.png">
+<p algin="center"><img src="/assets/marimo-modernaicourse-companion-logo.png"></p>
