@@ -20,12 +20,23 @@ understanding of the material and ultimately work up to training
 your own LLM
 - links to supplemental YouTube videos from [marimo's channel](https://youtube.com/@marimo-team/videos).
 
-You can run notebooks online with [molab](https://molab.marimo.io/notebooks),
+**Running notebooks.**
+The easiest way to run the notebooks in this repo is with [molab](https://molab.marimo.io/notebooks)
+(just click the "Open in molab") button. To run locally, [install
+`uv`](https://docs.astral.sh/uv/getting-started/installation/) then run
+
+```bash
+uvx marimo edit --sandbox --trusted <URL>
+```
+
+where `<URL>` is the GitHub URL of a notebook in this repo.
+
 or locally with the [marimo library](https://docs.marimo.io).
 
 ## Concepts
 
-Each concept notebook is associated with a lecture.
+Each concept notebook is associated with a lecture. To run a notebook online, click on the "Open in molab"
+button; to run locally
 
 | Lecture | Notebook | Get started on molab |
 | ------- | -------- | ---------- |
