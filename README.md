@@ -2,7 +2,8 @@
 
 <p align="center">
   <a href="https://marimo.io/discord?ref=readme" target="_blank"><strong>Discord</strong></a> ·
-  <a href="https://www.youtube.com/@modernaicourse" target="_blank"><strong>Lectures</strong></a>
+  <a href="https://www.youtube.com/@modernaicourse" target="_blank"><strong>Lectures</strong></a> ·
+  <a href="https://modernaicourse.org" target="_blank"><strong>Course Website</strong></a>
 </p>
 
 This is a companion repo to [Intro to Modern AI](https://modernaicourse.org), a
