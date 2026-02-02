@@ -1,4 +1,4 @@
-<img src="/assets/marimo-modernaicourse-companion-logo.png">
+<p align="center"><img src="/assets/marimo-modernaicourse-companion-logo.png"></p>
 
 <p align="center">
   <a href="https://marimo.io/discord?ref=readme" target="_blank"><strong>Discord</strong></a> ·
