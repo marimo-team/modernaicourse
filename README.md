@@ -8,8 +8,8 @@
 
 This is a companion repo to [Intro to Modern AI](https://modernaicourse.org), a
 free online class by [CMU professor Zico Kolter](https://zicokolter.com/) that
-teaches you how to train your own LLM from scratch using PyTorch, starting from
-the basics of machine learning.
+teaches you how to train your own LLM from scratch using PyTorch — no prior
+experience with machine learning or AI required.
 
 In this repo, you will find:
 
@@ -18,14 +18,18 @@ that illustrate key concepts from lecture videos, with code
 - [`homework/`](/homework/): an archive of homework notebooks that test your
 understanding of the material and ultimately work up to training
 your own LLM
-
-On this `README.md`, we also link to supplemental YouTube videos from the
-[marimo YouTube channel](https://youtube.com/@marimo-team/videos).
+- links to supplemental YouTube videos from [marimo's channel](https://youtube.com/@marimo-team/videos).
 
 You can run notebooks online with [molab](https://molab.marimo.io/notebooks),
 or locally with the [marimo library](https://docs.marimo.io).
 
 ## Concepts
+
+Each concept notebook is associated with a lecture.
+
+| Lecture | Notebook | Get started on molab |
+| ------- | -------- | ---------- |
+| [Lecture 2](https://www.youtube.com/watch?v=xIQkf7ZGQhM) | [Supervised learning: classifying cats and dogs](/concepts/02_supervised_learning.py) | [![Open in molab](https://marimo.io/molab-shield.svg)](https://molab.marimo.io/github/https://molab.marimo.io/github/marimo-team/modernaicourse/blob/main/concepts/02_supervised_learning.py) |
 
 ## Homeworks
 
