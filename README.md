@@ -1,7 +1,7 @@
 <p align="center"><img src="/assets/marimo-modernaicourse-companion-logo.png"></p>
 
 <p align="center">
-  <a href="https://marimo.io/discord?ref=readme" target="_blank"><strong>Discord</strong></a> ·
+  <a href="https://discord.gg/djbyJ9SZrC" target="_blank"><strong>Discord</strong></a> ·
   <a href="https://www.youtube.com/@modernaicourse" target="_blank"><strong>Lectures</strong></a> ·
   <a href="https://modernaicourse.org" target="_blank"><strong>Course Website</strong></a>
 </p>
