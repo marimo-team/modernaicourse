@@ -31,16 +31,15 @@ just click the "Open in molab" buttons in this README.
 uvx marimo edit --sandbox --trusted <URL>
 ```
 
-where `<URL>` is the GitHub URL of a notebook in this repo.
+where `<URL>` is the notebook's molab URL.
 
 ## Concepts
 
-Each concept notebook is associated with a lecture. To run a notebook online, click on the "Open in molab"
-button; to run locally
+Each concept notebook is associated with a lecture.
 
-| Lecture | Notebook | Get started on molab |
-| ------- | -------- | ---------- |
-| [Lecture 2](https://www.youtube.com/watch?v=xIQkf7ZGQhM) | [Supervised learning: classifying cats and dogs](/concepts/02_supervised_learning.py) | [![Open in molab](https://marimo.io/molab-shield.svg)](https://molab.marimo.io/github/https://molab.marimo.io/github/marimo-team/modernaicourse/blob/main/concepts/02_supervised_learning.py) |
+| Lecture | Get started on molab |
+| ------- | ---------- |
+| [Lecture 2: Supervised Learning](https://www.youtube.com/watch?v=xIQkf7ZGQhM) | [![Open in molab](https://marimo.io/molab-shield.svg)](https://molab.marimo.io/github/https://molab.marimo.io/github/marimo-team/modernaicourse/blob/main/concepts/02_supervised_learning.py) |
 
 ## Homeworks
 
