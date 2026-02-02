@@ -1,3 +1,1 @@
-XXX TODO: uv instructions, molab link
-* marimo: https://molab.marimo.io/github/modernaicourse/hw0/blob/main/hw0_marimo.py
-
+[![Open in molab](https://marimo.io/molab-shield.svg)](https://github.com/marimo-team/modernaicourse/blob/main/homework/hw0/hw0.py)
