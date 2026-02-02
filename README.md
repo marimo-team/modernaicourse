@@ -13,9 +13,9 @@ the basics of machine learning.
 
 In this repo, you will find:
 
-- `concepts/`: interactive marimo notebooks
+- [`concepts/`](/concepts/): interactive marimo notebooks
 that illustrate key concepts from lecture videos, with code
-- `homework/`: an archive of homework notebooks that test your
+- [`homework/`](/homework/): an archive of homework notebooks that test your
 understanding of the material and ultimately work up to training
 your own LLM
 
