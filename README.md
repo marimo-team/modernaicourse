@@ -6,23 +6,23 @@
   <a href="https://modernaicourse.org" target="_blank"><strong>Course Website</strong></a>
 </p>
 
+_This repo will be updated weekly, as the online version of Intro to modern AI progresses. [Join the discussion forum](https://github.com/marimo-team/modernaicourse/blob/main/homework/hw0/hw0_marimo.py) to learn with peers._
+
 This is a companion repo to [Intro to Modern AI](https://modernaicourse.org), a
-free online class by [CMU professor Zico Kolter](https://zicokolter.com/) that
+class by [CMU professor Zico Kolter](https://zicokolter.com/) that
 teaches you how to train your own LLM from scratch using PyTorch — no prior
 experience with machine learning or AI required.
 
 In this repo, you will find:
 
-- [`concepts/`](/concepts/): interactive marimo notebooks
-that illustrate key concepts from lecture videos, with code
-- [`homework/`](/homework/): an archive of homework notebooks that test your
-understanding of the material and ultimately work up to training
-your own LLM
-- links to supplemental YouTube videos from [marimo's channel](https://youtube.com/@marimo-team/videos).
+- [`concepts/`](/concepts/): marimo notebooks that illustrate key concepts from
+lecture videos, with code and UI elements
+- [`homework/`](/homework/): notebooks that test your understanding of
+the material and work up to training your own LLM
 
 **Running notebooks online.**
 The easiest way to run the notebooks in this repo is with [molab](https://molab.marimo.io/notebooks);
-just click the "Open in molab" buttons in this README.
+just click the links in this README.
 
 **Running notebooks locally.** To run locally with the [marimo library](https://docs.marimo.io), [install
 `uv`](https://docs.astral.sh/uv/getting-started/installation/) then run
@@ -37,11 +37,14 @@ where `<URL>` is the notebook's molab URL.
 
 Each concept notebook is associated with a lecture.
 
-| Lecture | Get started on molab |
+| Lecture | Notebook |
 | ------- | ---------- |
-| [Lecture 2: Supervised Learning](https://www.youtube.com/watch?v=xIQkf7ZGQhM) | [![Open in molab](https://marimo.io/molab-shield.svg)](https://molab.marimo.io/github/https://molab.marimo.io/github/marimo-team/modernaicourse/blob/main/concepts/02_supervised_learning.py) |
+| [Lecture 2: Intro to supervised machine learning](https://www.youtube.com/watch?v=xIQkf7ZGQhM) | [![Open in molab](https://marimo.io/molab-shield.svg)](https://molab.marimo.io/github/marimo-team/modernaicourse/blob/main/concepts/02_supervised_learning.py) |
 
-## Homeworks
+## Homework
+
+- [HW 0: Autograding and programming basics](https://github.com/marimo-team/modernaicourse/blob/main/homework/hw0/hw0.py)
+- [HW 1: Introduction to linear algebra and PyTorch](https://github.com/marimo-team/modernaicourse/blob/main/homework/hw1/hw1.py)
 
 ## About the course
 
