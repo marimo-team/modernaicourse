@@ -6,8 +6,9 @@
 </p>
 
 This is a companion repo to [Intro to Modern AI](https://modernaicourse.org), a
-free online class by CMU professor Zico Kolter that teaches you how to train
-your own LLM from scratch using PyTorch, starting from the basics of machine learning.
+free online class by [CMU professor Zico Kolter](https://zicokolter.com/) that
+teaches you how to train your own LLM from scratch using PyTorch, starting from
+the basics of machine learning.
 
 In this repo, you will find:
 
