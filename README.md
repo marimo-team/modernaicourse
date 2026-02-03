@@ -6,7 +6,7 @@
   <a href="https://modernaicourse.org" target="_blank"><strong>Course Website</strong></a>
 </p>
 
-_This repo will be updated weekly, as the online version of Intro to modern AI progresses. [Join the discussion forum](https://github.com/marimo-team/modernaicourse/blob/main/homework/hw0/hw0_marimo.py) to learn with peers._
+_This repo will be updated weekly, as the online version of CMU's Intro to Modern AI progresses. [Join the discussion forum](https://github.com/marimo-team/modernaicourse/blob/main/homework/hw0/hw0_marimo.py) to learn with peers._
 
 This is a companion repo to [Intro to Modern AI](https://modernaicourse.org), a
 class by [CMU professor Zico Kolter](https://zicokolter.com/) that
