@@ -15,7 +15,7 @@ experience with machine learning or AI required.
 
 In this repo, you will find:
 
-- [`concepts/`](/concepts/): marimo notebooks that illustrate key concepts from
+- [`concepts/`](/concepts/): [marimo](https://marimo.io) notebooks that illustrate key concepts from
 lecture videos, with code and UI elements
 - [`homework/`](/homework/): notebooks that test your understanding of
 the material and work up to training your own LLM
