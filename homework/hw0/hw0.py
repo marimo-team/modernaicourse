@@ -5,13 +5,16 @@
 #     "numpy==2.4.1",
 #     "pytest==9.0.2",
 #     "requests==2.32.5",
-#     "mugrade @ git+https://github.com/locuslab/mugrade.git",
+#     "mugrade",
 # ]
+#
+# [tool.uv.sources]
+# mugrade = { git = "https://github.com/locuslab/mugrade.git" }
 # ///
 
 import marimo
 
-__generated_with = "0.19.2"
+__generated_with = "0.19.7"
 app = marimo.App()
 
 with app.setup(hide_code=True):
@@ -157,7 +160,6 @@ def _():
 
     def test_add_type():
         assert isinstance(add(4, 2.1), float)
-
     return
 
 
@@ -198,7 +200,8 @@ def _():
     submitted _all_ the assignments for the course, you should additionally
     upload the notebook itself: download the notebook from molab, and upload it
     to mugrade using the "Upload Code" link at the bottom of the page
-    assignment page.""")
+    assignment page.
+    """)
     return
 
 
