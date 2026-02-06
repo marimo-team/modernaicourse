@@ -31,7 +31,7 @@ def _():
     machine learning algorithm — from linear regression to deep neural networks — relies on
     vectors, matrices, and the operations between them.
 
-    This notebook covers the essentials, as a supplement to lecture 3 of the [Modern AI Course](https://github.com/marimo-team/modernaicourse):
+    This notebook covers the essentials, supplementing lecture 3 of the [Modern AI Course](https://github.com/marimo-team/modernaicourse):
 
     | Topic | What you'll learn |
     |-------|------------------|
@@ -76,7 +76,7 @@ def _():
     return v, w
 
 
-@app.function
+@app.function(hide_code=True)
 def plot_vectors(vectors, colors, labels, title="", ax=None):
     """Plot 2D vectors as arrows from the origin."""
     if ax is None:
@@ -89,7 +89,10 @@ def plot_vectors(vectors, colors, labels, title="", ax=None):
             xytext=(0, 0),
             arrowprops=dict(arrowstyle="->,head_width=0.3,head_length=0.2", color=color, lw=2),
         )
-        ax.text(vx + 0.15, vy + 0.15, label, fontsize=12, color=color, fontweight="bold")
+        # Offset label away from origin so it doesn't overlap the arrow
+        _norm = (vx**2 + vy**2) ** 0.5 or 1.0
+        _ox, _oy = 0.25 * vx / _norm, 0.25 * vy / _norm
+        ax.text(vx + _ox, vy + _oy, label, fontsize=12, color=color, fontweight="bold", ha="center", va="center")
     all_coords = [float(c) for vec in vectors for c in vec]
     bound = max(abs(c) for c in all_coords) + 1.5
     ax.set_xlim(-bound, bound)
@@ -119,7 +122,7 @@ def _():
     return
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(v, w):
     _fig, (_ax1, _ax2) = plt.subplots(1, 2, figsize=(10, 5))
 
@@ -155,14 +158,20 @@ def _():
     return
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(v):
-    _fig, _ax = plt.subplots(figsize=(6, 5))
     _scalars = [0.5, 1.0, -1.0, 2.0]
     _colors = ["#54a24b", "#4c78a8", "#e45756", "#f58518"]
     _labels = ["0.5v", "v", "-v", "2v"]
-    _vecs = [s * v for s in _scalars]
-    plot_vectors(_vecs, _colors, _labels, title="Scalar multiplication", ax=_ax)
+
+    _fig, _axes = plt.subplots(1, 4, figsize=(12, 3))
+    _bound = float(2.0 * v.abs().max()) + 1.0
+    for _ax, _s, _c, _l in zip(_axes, _scalars, _colors, _labels):
+        _sv = _s * v
+        plot_vectors([_sv], [_c], [_l], title=f"c = {_s}", ax=_ax)
+        _ax.set_xlim(-_bound, _bound)
+        _ax.set_ylim(-_bound, _bound)
+    _fig.tight_layout()
     plt.gca()
     return
 
@@ -205,22 +214,7 @@ def _():
 
 @app.cell
 def _(A, B):
-    mo.md(f"""
-    **Addition:**
-    ```
-    A + B = {A + B}
-    ```
-
-    **Scalar multiplication:**
-    ```
-    3 * A = {3 * A}
-    ```
-
-    **Transpose:**
-    ```
-    A.T = {A.T}
-    ```
-    """)
+    A + B, 3 * A, A.T
     return
 
 
@@ -246,18 +240,7 @@ def _():
 
 @app.cell
 def _(v, w):
-    dot = torch.dot(v, w)
-    outer = torch.outer(v, w)
-    mo.md(f"""
-    `v = {v}`, `w = {w}`
-
-    **Dot product:** `torch.dot(v, w) = {dot}`
-
-    **Outer product:**
-    ```
-    torch.outer(v, w) = {outer}
-    ```
-    """)
+    torch.dot(v, w), torch.outer(v, w)
     return
 
 
@@ -279,14 +262,18 @@ def _():
     return
 
 
+@app.cell(hide_code=True)
+def _():
+    mo.md("""
+    In PyTorch, the `@` operator is used for matrix multiplication:
+    """)
+    return
+
+
 @app.cell
 def _(A, B):
     C = A @ B
-    mo.md(f"""
-    ```
-    A @ B = {C}
-    ```
-    """)
+    C
     return
 
 
@@ -328,13 +315,7 @@ def _():
 @app.cell
 def _(A):
     G = A.T @ A
-    mo.md(f"""
-    ```
-    G = A.T @ A = {G}
-    ```
-
-    **Symmetric?** `G == G.T` → `{torch.equal(G, G.T)}`
-    """)
+    G, G == G.T
     return
 
 
@@ -360,7 +341,7 @@ def _():
 @app.cell
 def _():
     matrix_widget = mo.ui.anywidget(
-        Matrix(matrix=np.eye(2).tolist(), step=0.1, min_value=-3.0, max_value=3.0)
+        Matrix(matrix=np.eye(2).tolist(), step=1, min_value=-3.0, max_value=3.0)
     )
     return (matrix_widget,)
 
@@ -387,8 +368,6 @@ def _(matrix_widget):
     _Me1 = M @ _e1
     _Me2 = M @ _e2
 
-    _det = float(M[0, 0] * M[1, 1] - M[0, 1] * M[1, 0])
-
     _fig, (_ax1, _ax2) = plt.subplots(1, 2, figsize=(10, 5))
 
     # Original
@@ -399,7 +378,7 @@ def _(matrix_widget):
     # Transformed
     _ax2.plot(_transformed[0].numpy(), _transformed[1].numpy(), color="#4c78a8", lw=2)
     plot_vectors([_Me1, _Me2], ["#e45756", "#54a24b"], ["Me₁", "Me₂"], ax=_ax2)
-    _ax2.set_title(f"Transformed  (det = {_det:.2f})", fontsize=13)
+    _ax2.set_title("Transformed", fontsize=13)
 
     # Match axis limits
     _all_pts = torch.cat([_circle, _transformed], dim=1)
@@ -427,10 +406,6 @@ def _():
     **Reflection** across the $x$-axis: $\begin{bmatrix}1&0\\0&-1\end{bmatrix}$, across the $y$-axis: $\begin{bmatrix}-1&0\\0&1\end{bmatrix}$.
 
     **Dilation** (uniform scaling): $\begin{bmatrix}c&0\\0&c\end{bmatrix}$ stretches ($c>1$) or shrinks ($0<c<1$) all directions equally.
-
-    The **determinant** measures the signed area scaling factor of the
-    transformation. $|\det(M)| > 1$ expands area, $|\det(M)| < 1$ shrinks it,
-    and $\det(M) < 0$ flips orientation.
     """)
     return
 
