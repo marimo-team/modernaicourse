@@ -455,7 +455,7 @@ def _():
     mo.md(r"""
     ### Problem 7: Matrix-matrix multiplication approach #1
 
-    Write a matrix-matrix multiplication function, again without using any built-in operators.  For $A \in \mathbb{R}^{m \times n}$ and $B \in \mathbb{R}^{m \times p}$, this version should compute each element $(AB)_{ij}$ as the inner product of the $i$th row of $A$ and the $j$th column of $B$.  Depicted graphically, this would be the breakdown
+    Write a matrix-matrix multiplication function, again without using any built-in operators.  For $A \in \mathbb{R}^{m \times n}$ and $B \in \mathbb{R}^{n \times p}$, this version should compute each element $(AB)_{ij}$ as the inner product of the $i$th row of $A$ and the $j$th column of $B$.  Depicted graphically, this would be the breakdown
 
     $$
     AB =
@@ -525,7 +525,7 @@ def _():
     mo.md(r"""
     ### Problem 8: Matrix-matrix multiplication approach #2
 
-    Write another matrix multiplication implemention. For $A \in \mathbb{R}^{m \times n}$ and $B \in \mathbb{R}^{m \times p}$, this version should compute the $i$th column of $AB$ as the matrix-vector product between $A$ and $i$th column of $B$. Depicted graphically, this would be the breakdown
+    Write another matrix multiplication implemention. For $A \in \mathbb{R}^{m \times n}$ and $B \in \mathbb{R}^{n \times p}$, this version should compute the $i$th column of $AB$ as the matrix-vector product between $A$ and $i$th column of $B$. Depicted graphically, this would be the breakdown
 
     $$
     AB =
@@ -589,7 +589,7 @@ def _():
     mo.md(r"""
     ### Problem 9: Matrix-matrix multiplication approach #3
 
-    Finally, write one last matrix multiplication implementation. For $A \in \mathbb{R}^{m \times n}$ and $B \in \mathbb{R}^{m \times p}$, this version should compute the $i$th row of $AB$ as the vector-matrix product between the $i$th row of $A$ and $B$. This would be the breakdown
+    Finally, write one last matrix multiplication implementation. For $A \in \mathbb{R}^{m \times n}$ and $B \in \mathbb{R}^{n \times p}$, this version should compute the $i$th row of $AB$ as the vector-matrix product between the $i$th row of $A$ and $B$. This would be the breakdown
 
     $$
     AB =
