@@ -1,0 +1,872 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.19.9"
+  },
+  "cells": [
+    {
+      "id": "Hbol",
+      "code_hash": "46972d31d5669447eb12b23f6c296a75",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"homework-1-introduction-to-linear-algebra-pytorch\">Homework 1 - Introduction to Linear Algebra + PyTorch</h2>\n<span class=\"paragraph\">This homework is aimed to familiarize you with some of the basic linear algebra operations we covered in class, as well as how to implement these functions and more in PyTorch.</span>\n<span class=\"paragraph\">As before, make a copy of the assignment to your drive, add your mugrade key, and then run the cells below to get started.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "a61bbd01dd4e17ab9034e996261257fa",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"problem-1-classical-programming-for-digit-classification\">Problem 1: ``Classical'' programming for digit classification</h3>\n<span class=\"paragraph\">This course deals primarily with machine learning approaches, but it's worth emphasizing that you <em>can</em> try to approach many of the problems you'll want to solve with machine learning with traditional programming approaches as well.  In this problem, you should experiment with developing a \"manual\" classifier between images of digits in the MNIST dataset, which will be the first machine learning mode you'll develop during the later assignments.  Specifically, you'll want to implement the following function <code>classify_zero_one</code> to classify between images of zeros and ones in the MNIST dataset.  Try to think intuitively about features that might distinguish between zeros and ones, and if possible, try not to look at any statistics from the actual dataset (i.e., average values of the images, or anything like that).</span>\n<span class=\"paragraph\">You can use the <code>images</code> dataset loaded above from the <code>hw1_tests.py</code> function (specifically the <code>images.data</code> and <code>images.targets</code> fields, which have been limited to just include the 0/1 images) to help you develop your code.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "6ec5afadba65caf334162c611eeca788",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">The next cell runs <em>unit tests</em> for the <code>classify_zero_one</code> function. Use these local tests to guide your implementation until all the tests pass.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "BYtC",
+      "code_hash": "f19791462117a50670eb2dc1eb746d6b",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"problem-2-vector-addition\">Problem 2: Vector Addition</h3>\n<span class=\"paragraph\">In the remainder of this assignment, you're going to implement a wide variety of simple linear algebra operators, <em>without</em> using any of the build-in tensor addition or matrix multiplication operators.  Your code should also throw assertion errors if any of the sizes do not match was it allowed for the given operation (i.e., you should be calling assert() to check that the sizes are correct).  Instead, you should use explicit for loops and element-by-element assignment/operations to implement your function.  You can also create new vectors of the right size as your return variable, etc.</span>\n<span class=\"paragraph\">First implement a simple vector addition function that adds two vectors together, <marimo-tex class=\"arithmatex\">||(x,y \\in \\mathbb{R}^n||)</marimo-tex>.  Note that it is ok if this only works when provided with vectors, i.e., 1D tensors.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "nWHF",
+      "code_hash": "bef6b6bdd66780baf31c2cf2ab5ec96f",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"problem-3-vector-inner-product\">Problem 3: Vector inner product</h3>\n<span class=\"paragraph\">Now implement the vector inner product.  I.e., for two vectors <marimo-tex class=\"arithmatex\">||(x, y \\in \\mathbb{R}^n||)</marimo-tex>, return the inner product\n$<marimo-tex class=\"arithmatex\">||(\\langle x,y \\rangle \\equiv x^T y = \\sum_{i=1}^n x_i y_i.||)</marimo-tex>$</span>\n<span class=\"paragraph\">As before, don't use any PyTorch functions that compute a matrix multiplication or inner product directly, but do it all with for loops.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "TqIu",
+      "code_hash": "04d611405295acb280118abf6ab36af3",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"problem-4-matrix-vector-product-approach-1\">Problem 4: Matrix-vector product approach #1</h3>\n<span class=\"paragraph\">Write a routine that function that computes the matrix-vector product <marimo-tex class=\"arithmatex\">||(Ax||)</marimo-tex> for <marimo-tex class=\"arithmatex\">||(A \\in \\mathbb{R}^{m \\times n}||)</marimo-tex> and <marimo-tex class=\"arithmatex\">||(x \\in \\mathbb{R}^n||)</marimo-tex>.  This version should compute each entry of the resuting vector using the inner product between rows of <marimo-tex class=\"arithmatex\">||(A||)</marimo-tex> and the vector <marimo-tex class=\"arithmatex\">||(x||)</marimo-tex>, i.e., shown graphically this would be</span>\n<marimo-tex class=\"arithmatex\">||[\nAx = \\left [ \\begin{array}{ccc}\n\\;\\text{\u2014} &amp; a^T_1 &amp; \\text{\u2014}\\; \\\\\n\\;\\text{\u2014} &amp; a^T_2 &amp; \\text{\u2014}\\; \\\\\n&amp; \\vdots &amp; \\\\\n\\;\\text{\u2014} &amp; a^T_m &amp; \\text{\u2014}\\;\n\\end{array} \\right ] \\left [ \\begin{array}{c}\\mid \\\\ x \\\\ \\mid \\end{array}  \\right ] = \\left [ \\begin{array}{c} a^T_1 x \\\\ a^T_2 x \\\\ \\vdots \\\\ a^T_m x \\end{array} \\right].\n||]</marimo-tex><span class=\"paragraph\">Only make use of the above-implemented <code>vector_inner_product()</code> function you implemetned above for this routine, i.e., no other operations on the tensors.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Pvdt",
+      "code_hash": "f6c6fdc391f8879859c4e04d0382c354",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"problem-5-matrix-vector-product-approach-2\">Problem 5: Matrix-vector product approach #2</h3>\n<span class=\"paragraph\">Write a routine that function that computes the matrix-vector product <marimo-tex class=\"arithmatex\">||(Ax||)</marimo-tex> for <marimo-tex class=\"arithmatex\">||(A \\in \\mathbb{R}^{m \\times n}||)</marimo-tex> and <marimo-tex class=\"arithmatex\">||(x \\in \\mathbb{R}^n||)</marimo-tex>.  This version should compute the result as a linear combination of the columns of <marimo-tex class=\"arithmatex\">||(A||)</marimo-tex> with coefficients given by the entries of <marimo-tex class=\"arithmatex\">||(x_i||)</marimo-tex>, i.e., shows graphically this would be</span>\n<marimo-tex class=\"arithmatex\">||[\nAx = \\left [ \\begin{array}{cccc} \\mid &amp; \\mid &amp; &amp; \\mid \\\\\na_1 &amp; a_2 &amp; \\cdots &amp; a_n \\\\\n\\mid &amp; \\mid &amp; &amp; \\mid \\end{array} \\right ]\n\\left [ \\begin{array}{c} x_1 \\\\ x_2 \\\\ \\vdots \\\\ x_n \\end{array}\\right ] =\n\\left [ \\begin{array}{c} \\mid \\\\ a_1 \\\\ \\mid \\end{array} \\right ] x_1 +\n\\left [ \\begin{array}{c} \\mid \\\\ a_2 \\\\ \\mid \\end{array} \\right ] x_2 + \\ldots +\n\\left [ \\begin{array}{c} \\mid \\\\ a_n \\\\ \\mid \\end{array} \\right ] x_n\n||]</marimo-tex><span class=\"paragraph\">Only make use of the above-implemented <code>vector_add()</code> function to implement your solution (plus of course creating vectors to return, etc).  It is also ok to multiply a vector by a scalar, i.e., the code <code>c*y</code> where <code>c</code> is a vector and <code>y</code> is a real-valued scalar.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "AjVT",
+      "code_hash": "20a27dd8a507e249a17f5e2d589a9d7e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"problem-6-vector-matrix-product-approach-2\">Problem 6: Vector-matrix product approach #2</h3>\n<span class=\"paragraph\">Write a routine that function that computes the vector-Matrix product <marimo-tex class=\"arithmatex\">||(x^TA||)</marimo-tex> for <marimo-tex class=\"arithmatex\">||(A \\in \\mathbb{R}^{m \\times n}||)</marimo-tex> and <marimo-tex class=\"arithmatex\">||(x \\in \\mathbb{R}^m||)</marimo-tex>.  In keeping with PyTorch convention (i.e., not differentiating between column and row vectors), this should return a 1D tensor representing the resulting row vector.</span>\n<span class=\"paragraph\">This version should compute the result as a linear combination of the rows of <marimo-tex class=\"arithmatex\">||(A||)</marimo-tex> with coefficients given by the entries of <marimo-tex class=\"arithmatex\">||(x_i||)</marimo-tex>, i.e., shows graphically this would be</span>\n<marimo-tex class=\"arithmatex\">||[\n\\begin{split}\nx^T A &amp; =\n\\left [ \\begin{array}{cccc} x_1 &amp; x_2 &amp; \\ldots &amp; x_m \\end{array} \\right ]\n\\left [ \\begin{array}{ccc}\n\\;\\text{\u2014} &amp; a^T_1 &amp; \\text{\u2014}\\; \\\\\n\\;\\text{\u2014} &amp; a^T_2 &amp; \\text{\u2014}\\; \\\\\n&amp; \\vdots &amp; \\\\\n\\;\\text{\u2014} &amp; a^T_m &amp; \\text{\u2014}\\;\n\\end{array} \\right ] \\\\ &amp; =\nx_1 \\left [ \\begin{array}{ccc} \\;\\text{\u2014} &amp; a^T_1 &amp; \\text{\u2014}\\; \\end{array} \\right ] +\nx_2 \\left [ \\begin{array}{ccc} \\;\\text{\u2014} &amp; a^T_2 &amp; \\text{\u2014}\\; \\end{array} \\right ] + \\ldots +\nx_m \\left [ \\begin{array}{ccc} \\;\\text{\u2014} &amp; a^T_m &amp; \\text{\u2014}\\; \\end{array} \\right ]\n\\end{split}\n||]</marimo-tex><span class=\"paragraph\">Only make use of the above-implemented <code>vector_add()</code> function to implement your solution, with the same caveats as in the previous problem.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "TXez",
+      "code_hash": "30ff8b464a14522f7b1be9ed2f1ac67c",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"problem-7-matrix-matrix-multiplication-approach-1\">Problem 7: Matrix-matrix multiplication approach #1</h3>\n<span class=\"paragraph\">Write a matrix-matrix multiplication function, again without using any built-in operators.  For <marimo-tex class=\"arithmatex\">||(A \\in \\mathbb{R}^{m \\times n}||)</marimo-tex> and <marimo-tex class=\"arithmatex\">||(B \\in \\mathbb{R}^{n \\times p}||)</marimo-tex>, this version should compute each element <marimo-tex class=\"arithmatex\">||((AB)_{ij}||)</marimo-tex> as the inner product of the <marimo-tex class=\"arithmatex\">||(i||)</marimo-tex>th row of <marimo-tex class=\"arithmatex\">||(A||)</marimo-tex> and the <marimo-tex class=\"arithmatex\">||(j||)</marimo-tex>th column of <marimo-tex class=\"arithmatex\">||(B||)</marimo-tex>.  Depicted graphically, this would be the breakdown</span>\n<marimo-tex class=\"arithmatex\">||[\nAB =\n\\left [ \\begin{array}{ccc}\n\\;\\text{\u2014} &amp; a^T_1 &amp; \\text{\u2014}\\; \\\\\n\\;\\text{\u2014} &amp; a^T_2 &amp; \\text{\u2014}\\; \\\\\n&amp; \\vdots &amp; \\\\\n\\;\\text{\u2014} &amp; a^T_m &amp; \\text{\u2014}\\;\n\\end{array} \\right ]\n\\left [ \\begin{array}{cccc} \\mid &amp; \\mid &amp; &amp; \\mid \\\\\nb_1 &amp; b_2 &amp; \\cdots &amp; b_p \\\\\n\\mid &amp; \\mid &amp; &amp; \\mid \\end{array} \\right ]\n=\n\\left [ \\begin{array}{cccc} a_1^T b_1 &amp; a_1^T b_2 &amp; \\cdots &amp; a_1^T b_p \\\\\na_2^T b_1 &amp; a_1^T b_2 &amp; \\cdots &amp; a_2^T b_p \\\\\n\\vdots &amp; \\vdots &amp; \\ddots &amp; \\vdots \\\\\na_m^T b_1 &amp; a_m^T b_2 &amp; \\cdots &amp; a_m^T b_p \\end{array} \\right ]\n||]</marimo-tex><span class=\"paragraph\">With all the same caveats as before, this implementation should only use the function <code>vector_inner_product()</code> that you implemented above.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "wAgl",
+      "code_hash": "59e53b36d7b26280e27ca0bd9bd5a5e3",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"problem-8-matrix-matrix-multiplication-approach-2\">Problem 8: Matrix-matrix multiplication approach #2</h3>\n<span class=\"paragraph\">Write another matrix multiplication implemention. For <marimo-tex class=\"arithmatex\">||(A \\in \\mathbb{R}^{m \\times n}||)</marimo-tex> and <marimo-tex class=\"arithmatex\">||(B \\in \\mathbb{R}^{n \\times p}||)</marimo-tex>, this version should compute the <marimo-tex class=\"arithmatex\">||(i||)</marimo-tex>th column of <marimo-tex class=\"arithmatex\">||(AB||)</marimo-tex> as the matrix-vector product between <marimo-tex class=\"arithmatex\">||(A||)</marimo-tex> and <marimo-tex class=\"arithmatex\">||(i||)</marimo-tex>th column of <marimo-tex class=\"arithmatex\">||(B||)</marimo-tex>. Depicted graphically, this would be the breakdown</span>\n<marimo-tex class=\"arithmatex\">||[\nAB =\nA\n\\left [ \\begin{array}{cccc} \\mid &amp; \\mid &amp; &amp; \\mid \\\\\nb_1 &amp; b_2 &amp; \\cdots &amp; b_p \\\\\n\\mid &amp; \\mid &amp; &amp; \\mid \\end{array} \\right ]\n=\n\\left [ \\begin{array}{cccc} \\mid &amp; \\mid &amp; &amp; \\mid \\\\\nA b_1 &amp; A b_2 &amp; \\cdots &amp; A b_p \\\\\n\\mid &amp; \\mid &amp; &amp; \\mid \\end{array} \\right ]\n||]</marimo-tex><span class=\"paragraph\">With all the same caveats as before, this implementation should only use the function <code>matrix_vector_product_1()</code> (or <code>matrix_vector_product_2()</code>) that you implemented above.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "yOPj",
+      "code_hash": "96c9289463b11e54a2283d13b5904995",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"problem-9-matrix-matrix-multiplication-approach-3\">Problem 9: Matrix-matrix multiplication approach #3</h3>\n<span class=\"paragraph\">Finally, write one last matrix multiplication implementation. For <marimo-tex class=\"arithmatex\">||(A \\in \\mathbb{R}^{m \\times n}||)</marimo-tex> and <marimo-tex class=\"arithmatex\">||(B \\in \\mathbb{R}^{n \\times p}||)</marimo-tex>, this version should compute the <marimo-tex class=\"arithmatex\">||(i||)</marimo-tex>th row of <marimo-tex class=\"arithmatex\">||(AB||)</marimo-tex> as the vector-matrix product between the <marimo-tex class=\"arithmatex\">||(i||)</marimo-tex>th row of <marimo-tex class=\"arithmatex\">||(A||)</marimo-tex> and <marimo-tex class=\"arithmatex\">||(B||)</marimo-tex>. This would be the breakdown</span>\n<marimo-tex class=\"arithmatex\">||[\nAB =\n\\left [ \\begin{array}{ccc}\n\\;\\text{\u2014} &amp; a^T_1 &amp; \\text{\u2014}\\; \\\\\n\\;\\text{\u2014} &amp; a^T_2 &amp; \\text{\u2014}\\; \\\\\n&amp; \\vdots &amp; \\\\\n\\;\\text{\u2014} &amp; a^T_m &amp; \\text{\u2014}\\;\n\\end{array} \\right ] B =\n\\left [ \\begin{array}{ccc}\n\\;\\text{\u2014} &amp; a^T_1 B &amp; \\text{\u2014}\\; \\\\\n\\;\\text{\u2014} &amp; a^T_2 B &amp; \\text{\u2014}\\; \\\\\n&amp; \\vdots &amp; \\\\\n\\;\\text{\u2014} &amp; a^T_m B &amp; \\text{\u2014}\\;\n\\end{array} \\right ]\n||]</marimo-tex><span class=\"paragraph\">With all the same caveats as before, this implementation should only use the function <code>vector_matrix_product_2()</code> that you implemented above.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "mWxS",
+      "code_hash": "e55f87b9c1ecbcff1dfdb8b6502f6129",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"problem-10-batch-matrix-multiplication\">Problem 10: Batch matrix multiplication</h3>\n<span class=\"paragraph\">In this problem, you will implement batch matrix multiplication.  Consider two ND PyTorch tensors of the dimensions <marimo-tex class=\"arithmatex\">||(A \\in \\mathbb{R}^{n_1 \\times n_2 \\times \\ldots \\times n_d}||)</marimo-tex> <marimo-tex class=\"arithmatex\">||(B \\in \\mathbb{R}^{m_1 \\times m_2 \\times \\ldots \\times m_d}||)</marimo-tex> with the same sizes on all but the last two dimensions</span>\n<marimo-tex class=\"arithmatex\">||[ n_i = m_i, \\; i=1,\\ldots,d-2||]</marimo-tex><span class=\"paragraph\">and the last two dimensions properly sized for a matrix multiplication</span>\n<marimo-tex class=\"arithmatex\">||[n_i = m_{i-1}.||]</marimo-tex><span class=\"paragraph\">In this case implement a batched version of matrix multiplication that iterates over all the leading <marimo-tex class=\"arithmatex\">||(d-2||)</marimo-tex> dimensions and performs a matrix multiplication of the corresponding entries.  The function should throw an AssertionError if any of the sizes do not match.</span>\n<span class=\"paragraph\">You should still not use the PyTorch matrix multiplication operator, but instead call one of the <code>matmul()</code> functions you implemented above (it doesn't really matter which one).</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "xvXZ",
+      "code_hash": "c25a846388a537ab0feabcbbbf5c5ddb",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"problem-11-block-matrix-multiplication\">Problem 11: Block matrix multiplication</h3>\n<span class=\"paragraph\">In this last question, you'll implement a \"blocked\" form of matrix multiplication.  Although we defined matrix multiplication in terms of the individual scalar entries of a matrix, it can also be defined by operating on subblocks of the matrices.  Specifically for an matrix <marimo-tex class=\"arithmatex\">||(A \\in \\mathbb{R}^{4m \\times 4n}||)</marimo-tex> we can define <marimo-tex class=\"arithmatex\">||(A_{ij} \\in \\mathbb{R}^{4 \\times 4}||)</marimo-tex> to be a <em>subblock</em> of the matrix, and similarly for the matrix $B \\in \\mathbb{R}^{4n \\times 4p}.  Then the corresponding <marimo-tex class=\"arithmatex\">||(4 \\times 4||)</marimo-tex> subblock of the matrix product <marimo-tex class=\"arithmatex\">||(AB||)</marimo-tex> can be computed as\n$$ (AB)<em>ij = \\sum</em>{k=1}^n A_{ik} B_{kj} $$\nanalogous to the usual definition of matrix multiplication, but with <marimo-tex class=\"arithmatex\">||(A_{ik} B_{kj}||)</marimo-tex> now being a matrix product.</span>\n<span class=\"paragraph\">In practice, techniques like this (with proper memory layouts, which we don't cover here) are how write fast matrix multiplication primitives on GPUs (where e.g., so-called \"tensor cores\" actually exactly perform 4x4 matrix multiplication).</span>\n<span class=\"paragraph\">Implement the <code>block_matmul</code> function below.  You should <em>only</em> call the <code>add_matmul_44()</code> function in your implementation.  You should check to ensure that the matrices form a valid matrix multiplication, and that they are all divisible by 4.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "setup",
+      "code_hash": "23df8740eda112985d4f1270718e1bf6",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stderr",
+          "text": "File \u2018hw1_tests.py\u2019 already there; not retrieving.\n\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "a59d8e787fcb3752e9be0671fe07f160",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "f101be21bf58d4ecbc4a94449835d6d6",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": "016f83a4ca38d1a07570e529bd18d22d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "\u001b[31mF\u001b[0m\u001b[31m                                                                        [100%]\u001b[0m\n=================================== FAILURES ===================================\n\u001b[31m\u001b[1m______________________ .hw1.test_classify_zero_one_local _______________________\u001b[0m\n\n    def test_classify_zero_one_local():\n>       test_classify_zero_one(classify_zero_one)\n\n\u001b[1m\u001b[31mmarimo://hw1.py#cell_id=cell\u001b[0m:2: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nclassify_zero_one = <function classify_zero_one at 0x1340350c0>\n\n    def test_classify_zero_one(classify_zero_one):\n        # test on the first two images\n>       assert(classify_zero_one(images.data[0]) == 0)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\u001b[1m\u001b[31mE       AssertionError\u001b[0m\n\n\u001b[1m\u001b[31mhw1_tests.py\u001b[0m:69: AssertionError\n=================================== Overview ===================================\n\nSummary:\nTotal: 1, Passed: 0, Failed: 1, Errors: 0, Skipped: 0\n\u001b[36m\u001b[1m=========================== short test summary info ============================\u001b[0m\n\u001b[31mFAILED\u001b[0m .::\u001b[1mtest_classify_zero_one_local\u001b[0m - AssertionError\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "Xref",
+      "code_hash": "409ce44cc4d84038287e6bb515bb2dbe",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='Xref-0' random-id='2349ebb1-f161-bdcf-df85-5923f17cf6a2'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;classify_zero_one&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SFPL",
+      "code_hash": "ee185006c2522fc1a6dd4a19d8b233c1",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "RGSE",
+      "code_hash": "b6bf7e187be7ed8c3d1c45b5d806f804",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Kclp",
+      "code_hash": "8c7a3f7571ec13c55ab4998e015c826f",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "\u001b[31mF\u001b[0m\u001b[31m                                                                        [100%]\u001b[0m\n=================================== FAILURES ===================================\n\u001b[31m\u001b[1m__________________________ .hw1.test_vector_add_local __________________________\u001b[0m\n\n    def test_vector_add_local():\n>       test_vector_add(vector_add)\n\n\u001b[1m\u001b[31mmarimo://hw1.py#cell_id=cell\u001b[0m:2: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nvector_add = <function vector_add at 0x1344fd7a0>\n\n    def test_vector_add(vector_add):\n        a,b = torch.randn(5), torch.randn(5)\n        with PreventTorchOps():\n            z = vector_add(a,b)\n>       assert(torch.allclose(z,a+b))\n               ^^^^^^^^^^^^^^^^^^^^^\n\u001b[1m\u001b[31mE       TypeError: allclose(): argument 'input' (position 1) must be Tensor, not NoneType\u001b[0m\n\n\u001b[1m\u001b[31mhw1_tests.py\u001b[0m:91: TypeError\n=================================== Overview ===================================\n\nSummary:\nTotal: 1, Passed: 0, Failed: 1, Errors: 0, Skipped: 0\n\u001b[36m\u001b[1m=========================== short test summary info ============================\u001b[0m\n\u001b[31mFAILED\u001b[0m .::\u001b[1mtest_vector_add_local\u001b[0m - TypeError: allclose(): argument 'input' (position 1) must be Tensor, not No...\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "emfo",
+      "code_hash": "0d762c4796e2a639ca4c5c3bf485532e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='emfo-0' random-id='f29708a4-0e95-f7d7-65e2-e7aae6f92a7a'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;vector_add&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Hstk",
+      "code_hash": "2b704e9461e0b48fc67dda90b9d0bd5f",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "iLit",
+      "code_hash": "02b28883bbd9db387c05f86dae5e07f6",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ZHCJ",
+      "code_hash": "a56b30ae1086913869f7894d871cc9b9",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "\u001b[31mF\u001b[0m\u001b[31m                                                                        [100%]\u001b[0m\n=================================== FAILURES ===================================\n\u001b[31m\u001b[1m_____________________ .hw1.test_vector_inner_product_local _____________________\u001b[0m\n\n    def test_vector_inner_product_local():\n>       test_vector_inner_product(vector_inner_product)\n\n\u001b[1m\u001b[31mmarimo://hw1.py#cell_id=cell\u001b[0m:2: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nvector_inner_product = <function vector_inner_product at 0x133adc9e0>\n\n    def test_vector_inner_product(vector_inner_product):\n        a,b = torch.randn(5), torch.randn(5)\n        with PreventTorchOps():\n            z = vector_inner_product(a,b)\n>       assert(torch.allclose(torch.tensor(z),a@b))\n                              ^^^^^^^^^^^^^^^\n\u001b[1m\u001b[31mE       RuntimeError: Could not infer dtype of NoneType\u001b[0m\n\n\u001b[1m\u001b[31mhw1_tests.py\u001b[0m:112: RuntimeError\n=================================== Overview ===================================\n\nSummary:\nTotal: 1, Passed: 0, Failed: 1, Errors: 0, Skipped: 0\n\u001b[36m\u001b[1m=========================== short test summary info ============================\u001b[0m\n\u001b[31mFAILED\u001b[0m .::\u001b[1mtest_vector_inner_product_local\u001b[0m - RuntimeError: Could not infer dtype of NoneType\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "ROlb",
+      "code_hash": "8eadd793af7bff933d31f11f69a00d2d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='ROlb-0' random-id='a11c9344-f9cd-cebb-8b06-aa1b796782f6'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;vector_inner_product&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "qnkX",
+      "code_hash": "6bcc3a9c99657fd149c3917821e685d3",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Vxnm",
+      "code_hash": "6058fb4b9eb5b60d2b745c1ade3d7174",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "DnEU",
+      "code_hash": "7c24072fdf8b20045996c307f2309538",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "\u001b[31mF\u001b[0m\u001b[31m                                                                        [100%]\u001b[0m\n=================================== FAILURES ===================================\n\u001b[31m\u001b[1m___________________ .hw1.test_matrix_vector_product_1_local ____________________\u001b[0m\n\n    def test_matrix_vector_product_1_local():\n>       test_matrix_vector_product_1(matrix_vector_product_1)\n\n\u001b[1m\u001b[31mmarimo://hw1.py#cell_id=cell\u001b[0m:2: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nmatrix_vector_product_1 = <function matrix_vector_product_1 at 0x134220f60>\n\n    def test_matrix_vector_product_1(matrix_vector_product_1):\n        a,b = torch.randn(5,4), torch.randn(4)\n        with PreventTorchOps():\n            z = matrix_vector_product_1(a,b)\n>       assert(torch.allclose(z,a@b))\n               ^^^^^^^^^^^^^^^^^^^^^\n\u001b[1m\u001b[31mE       TypeError: allclose(): argument 'input' (position 1) must be Tensor, not NoneType\u001b[0m\n\n\u001b[1m\u001b[31mhw1_tests.py\u001b[0m:134: TypeError\n=================================== Overview ===================================\n\nSummary:\nTotal: 1, Passed: 0, Failed: 1, Errors: 0, Skipped: 0\n\u001b[36m\u001b[1m=========================== short test summary info ============================\u001b[0m\n\u001b[31mFAILED\u001b[0m .::\u001b[1mtest_matrix_vector_product_1_local\u001b[0m - TypeError: allclose(): argument 'input' (position 1) must be Tensor, not No...\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "ulZA",
+      "code_hash": "cfab0fc321eaae0cc7353b09c4beb42c",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='ulZA-0' random-id='ee2ff862-451b-3140-8199-4f68b9b22b7e'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;matrix_vector_product_1&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ecfG",
+      "code_hash": "4ae0a6ce174e77111bdcde45b071b0d4",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ZBYS",
+      "code_hash": "f5e5569f2005f9f641c8c334ac30f31b",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "aLJB",
+      "code_hash": "5b102b3fb3eee8b5ebcfe51a5f5acbd3",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "\u001b[31mF\u001b[0m\u001b[31m                                                                        [100%]\u001b[0m\n=================================== FAILURES ===================================\n\u001b[31m\u001b[1m___________________ .hw1.test_matrix_vector_product_2_local ____________________\u001b[0m\n\n    def test_matrix_vector_product_2_local():\n>       test_matrix_vector_product_2(matrix_vector_product_2)\n\n\u001b[1m\u001b[31mmarimo://hw1.py#cell_id=cell\u001b[0m:2: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nmatrix_vector_product_2 = <function matrix_vector_product_2 at 0x134693320>\n\n    def test_matrix_vector_product_2(matrix_vector_product_2):\n        a,b = torch.randn(5,4), torch.randn(4)\n        with PreventTorchOps():\n            z = matrix_vector_product_2(a,b)\n>       assert(torch.allclose(z,a@b))\n               ^^^^^^^^^^^^^^^^^^^^^\n\u001b[1m\u001b[31mE       TypeError: allclose(): argument 'input' (position 1) must be Tensor, not NoneType\u001b[0m\n\n\u001b[1m\u001b[31mhw1_tests.py\u001b[0m:157: TypeError\n=================================== Overview ===================================\n\nSummary:\nTotal: 1, Passed: 0, Failed: 1, Errors: 0, Skipped: 0\n\u001b[36m\u001b[1m=========================== short test summary info ============================\u001b[0m\n\u001b[31mFAILED\u001b[0m .::\u001b[1mtest_matrix_vector_product_2_local\u001b[0m - TypeError: allclose(): argument 'input' (position 1) must be Tensor, not No...\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "nHfw",
+      "code_hash": "c1fcabbd63fa55f355343ce8f232041d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='nHfw-0' random-id='9e3cf70a-7263-f277-7fb5-90e1c70f3396'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;matrix_vector_product_2&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "xXTn",
+      "code_hash": "5be73ba30c57193765f7156ab62e25d0",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "pHFh",
+      "code_hash": "808c0caa35875537d4e766518d08c85e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "NCOB",
+      "code_hash": "571e403b4041790646055b7db8ca0ecb",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "\u001b[31mF\u001b[0m\u001b[31m                                                                        [100%]\u001b[0m\n=================================== FAILURES ===================================\n\u001b[31m\u001b[1m___________________ .hw1.test_vector_matrix_product_2_local ____________________\u001b[0m\n\n    def test_vector_matrix_product_2_local():\n>       test_vector_matrix_product_2(vector_matrix_product_2)\n\n\u001b[1m\u001b[31mmarimo://hw1.py#cell_id=cell\u001b[0m:2: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nvector_matrix_product_2 = <function vector_matrix_product_2 at 0x13459b3d0>\n\n    def test_vector_matrix_product_2(vector_matrix_product_2):\n        a,b = torch.randn(4,5), torch.randn(4)\n        with PreventTorchOps():\n            z = vector_matrix_product_2(b,a)\n>       assert(torch.allclose(z,b@a))\n               ^^^^^^^^^^^^^^^^^^^^^\n\u001b[1m\u001b[31mE       TypeError: allclose(): argument 'input' (position 1) must be Tensor, not NoneType\u001b[0m\n\n\u001b[1m\u001b[31mhw1_tests.py\u001b[0m:181: TypeError\n=================================== Overview ===================================\n\nSummary:\nTotal: 1, Passed: 0, Failed: 1, Errors: 0, Skipped: 0\n\u001b[36m\u001b[1m=========================== short test summary info ============================\u001b[0m\n\u001b[31mFAILED\u001b[0m .::\u001b[1mtest_vector_matrix_product_2_local\u001b[0m - TypeError: allclose(): argument 'input' (position 1) must be Tensor, not No...\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "aqbW",
+      "code_hash": "bb7090dcdf45b03367641c7ff5fff6ac",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='aqbW-0' random-id='81a10249-7fa5-f316-8694-8807019d14d6'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;vector_matrix_product_2&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "TRpd",
+      "code_hash": "2768e5f6961c31960a8256360d28e95a",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "dNNg",
+      "code_hash": "87ee67492841e3a900b0f4736c71a8f5",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "yCnT",
+      "code_hash": "d9fcf7e80f8a6b1feeaa486e9bdcd560",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "\u001b[31mF\u001b[0m\u001b[31m                                                                        [100%]\u001b[0m\n=================================== FAILURES ===================================\n\u001b[31m\u001b[1m___________________________ .hw1.test_matmul_1_local ___________________________\u001b[0m\n\n    def test_matmul_1_local():\n>       test_matmul_1(matmul_1)\n\n\u001b[1m\u001b[31mmarimo://hw1.py#cell_id=cell\u001b[0m:2: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nmatmul_1 = <function matmul_1 at 0x1345b7270>\n\n    def test_matmul_1(matmul_1):\n        a,b = torch.randn(4,5), torch.randn(5,6)\n        with PreventTorchOps():\n            z = matmul_1(a,b)\n>       assert(torch.allclose(z,a@b))\n               ^^^^^^^^^^^^^^^^^^^^^\n\u001b[1m\u001b[31mE       TypeError: allclose(): argument 'input' (position 1) must be Tensor, not NoneType\u001b[0m\n\n\u001b[1m\u001b[31mhw1_tests.py\u001b[0m:204: TypeError\n=================================== Overview ===================================\n\nSummary:\nTotal: 1, Passed: 0, Failed: 1, Errors: 0, Skipped: 0\n\u001b[36m\u001b[1m=========================== short test summary info ============================\u001b[0m\n\u001b[31mFAILED\u001b[0m .::\u001b[1mtest_matmul_1_local\u001b[0m - TypeError: allclose(): argument 'input' (position 1) must be Tensor, not No...\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "wlCL",
+      "code_hash": "19049eaf187b9ba07267eb5f183f4d4b",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='wlCL-0' random-id='4658f909-c20a-5495-c38d-177f92a236c1'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;matmul_1&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "kqZH",
+      "code_hash": "85dd4a3a70bc24be717e81c0bbbb5647",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "rEll",
+      "code_hash": "69f9c45c4183c2d4c77b75ab21186fe1",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "dGlV",
+      "code_hash": "a35893f05a9a891c7fd9b6d5367bc21a",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "\u001b[31mF\u001b[0m\u001b[31m                                                                        [100%]\u001b[0m\n=================================== FAILURES ===================================\n\u001b[31m\u001b[1m___________________________ .hw1.test_matmul_2_local ___________________________\u001b[0m\n\n    def test_matmul_2_local():\n>       test_matmul_2(matmul_2)\n\n\u001b[1m\u001b[31mmarimo://hw1.py#cell_id=cell\u001b[0m:2: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nmatmul_2 = <function matmul_2 at 0x1345e6b90>\n\n    def test_matmul_2(matmul_2):\n        a,b = torch.randn(4,5), torch.randn(5,6)\n        with PreventTorchOps():\n            z = matmul_2(a,b)\n>       assert(torch.allclose(z,a@b))\n               ^^^^^^^^^^^^^^^^^^^^^\n\u001b[1m\u001b[31mE       TypeError: allclose(): argument 'input' (position 1) must be Tensor, not NoneType\u001b[0m\n\n\u001b[1m\u001b[31mhw1_tests.py\u001b[0m:230: TypeError\n=================================== Overview ===================================\n\nSummary:\nTotal: 1, Passed: 0, Failed: 1, Errors: 0, Skipped: 0\n\u001b[36m\u001b[1m=========================== short test summary info ============================\u001b[0m\n\u001b[31mFAILED\u001b[0m .::\u001b[1mtest_matmul_2_local\u001b[0m - TypeError: allclose(): argument 'input' (position 1) must be Tensor, not No...\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "SdmI",
+      "code_hash": "a93368bb9bb68a71f467d79d9b66a18f",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='SdmI-0' random-id='e8b354a5-e81b-6cde-8837-882923f81ed5'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;matmul_2&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lgWD",
+      "code_hash": "9c6ca346c18e75b531d26ade2c587c8d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "fwwy",
+      "code_hash": "599c280b000ae35cdb5221bf1b428e75",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "LJZf",
+      "code_hash": "4b939f4e878e809c74fe9f383009818c",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "\u001b[31mF\u001b[0m\u001b[31m                                                                        [100%]\u001b[0m\n=================================== FAILURES ===================================\n\u001b[31m\u001b[1m___________________________ .hw1.test_matmul_3_local ___________________________\u001b[0m\n\n    def test_matmul_3_local():\n>       test_matmul_3(matmul_3)\n\n\u001b[1m\u001b[31mmarimo://hw1.py#cell_id=cell\u001b[0m:2: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nmatmul_3 = <function matmul_3 at 0x134220930>\n\n    def test_matmul_3(matmul_3):\n        a,b = torch.randn(4,5), torch.randn(5,6)\n        with PreventTorchOps():\n            z = matmul_3(a,b)\n>       assert(torch.allclose(z,a@b))\n               ^^^^^^^^^^^^^^^^^^^^^\n\u001b[1m\u001b[31mE       TypeError: allclose(): argument 'input' (position 1) must be Tensor, not NoneType\u001b[0m\n\n\u001b[1m\u001b[31mhw1_tests.py\u001b[0m:257: TypeError\n=================================== Overview ===================================\n\nSummary:\nTotal: 1, Passed: 0, Failed: 1, Errors: 0, Skipped: 0\n\u001b[36m\u001b[1m=========================== short test summary info ============================\u001b[0m\n\u001b[31mFAILED\u001b[0m .::\u001b[1mtest_matmul_3_local\u001b[0m - TypeError: allclose(): argument 'input' (position 1) must be Tensor, not No...\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "urSm",
+      "code_hash": "8db5bf10ba030053adcaa538c985cb5d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='urSm-0' random-id='0c022924-3b79-2044-9065-d93b76fee8dd'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;matmul_3&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "jxvo",
+      "code_hash": "1f46e54e4a85c0d9bf0f184d47737a69",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "CcZR",
+      "code_hash": "7ed5f3a8c8989df06fbdb69dbff164f1",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "YWSi",
+      "code_hash": "ba984211c465c184cd33f142946f3dec",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "\u001b[31mF\u001b[0m\u001b[31m                                                                        [100%]\u001b[0m\n=================================== FAILURES ===================================\n\u001b[31m\u001b[1m_________________________ .hw1.test_batch_matmul_local _________________________\u001b[0m\n\n    def test_batch_matmul_local():\n>       test_batch_matmul(batch_matmul)\n\n\u001b[1m\u001b[31mmarimo://hw1.py#cell_id=cell\u001b[0m:2: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nbatch_matmul = <function batch_matmul at 0x1342210c0>\n\n    def test_batch_matmul(batch_matmul):\n        a,b = torch.randn(2,3,4,5), torch.randn(2,3,5,6)\n        with PreventTorchOps():\n            z = batch_matmul(a,b)\n>       assert(torch.allclose(z,a@b))\n               ^^^^^^^^^^^^^^^^^^^^^\n\u001b[1m\u001b[31mE       TypeError: allclose(): argument 'input' (position 1) must be Tensor, not NoneType\u001b[0m\n\n\u001b[1m\u001b[31mhw1_tests.py\u001b[0m:284: TypeError\n=================================== Overview ===================================\n\nSummary:\nTotal: 1, Passed: 0, Failed: 1, Errors: 0, Skipped: 0\n\u001b[36m\u001b[1m=========================== short test summary info ============================\u001b[0m\n\u001b[31mFAILED\u001b[0m .::\u001b[1mtest_batch_matmul_local\u001b[0m - TypeError: allclose(): argument 'input' (position 1) must be Tensor, not No...\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "zlud",
+      "code_hash": "224f5aaa736cc2e8e237646cb31f82b2",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='zlud-0' random-id='6bd90b40-70de-e62b-b4fd-d779527f5447'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;batch_matmul&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "tZnO",
+      "code_hash": "7377fa2dd2b041901abf55bc76de7b3d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "CLip",
+      "code_hash": "9941b87e82ac1d70cdfa8f2ea16c4566",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "YECM",
+      "code_hash": "25b5302955badf3c2827a72b3a097c08",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "cEAS",
+      "code_hash": "229a208517c45d505d2642260dae675c",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "\u001b[31mF\u001b[0m\u001b[31m                                                                        [100%]\u001b[0m\n=================================== FAILURES ===================================\n\u001b[31m\u001b[1m_________________________ .hw1.test_block_matmul_local _________________________\u001b[0m\n\n    def test_block_matmul_local():\n>       test_block_matmul(block_matmul)\n\n\u001b[1m\u001b[31mmarimo://hw1.py#cell_id=cell\u001b[0m:2: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nblock_matmul = <function block_matmul at 0x13477ce00>\n\n    def test_block_matmul(block_matmul):\n        a,b = torch.randn(16,12), torch.randn(12,8)\n        with PreventTorchOps():\n            z = block_matmul(a,b)\n>       assert(torch.allclose(z,a@b))\n               ^^^^^^^^^^^^^^^^^^^^^\n\u001b[1m\u001b[31mE       TypeError: allclose(): argument 'input' (position 1) must be Tensor, not NoneType\u001b[0m\n\n\u001b[1m\u001b[31mhw1_tests.py\u001b[0m:323: TypeError\n=================================== Overview ===================================\n\nSummary:\nTotal: 1, Passed: 0, Failed: 1, Errors: 0, Skipped: 0\n\u001b[36m\u001b[1m=========================== short test summary info ============================\u001b[0m\n\u001b[31mFAILED\u001b[0m .::\u001b[1mtest_block_matmul_local\u001b[0m - TypeError: allclose(): argument 'input' (position 1) must be Tensor, not No...\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "iXej",
+      "code_hash": "339ae492f0896b09b7de8f70c5946f97",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='iXej-0' random-id='343b8562-13a5-0f1e-6788-75d63edacbd9'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;block_matmul&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "EJmg",
+      "code_hash": "fbd43bccc3b2dfb27fdf009dd2439c66",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    }
+  ]
+}

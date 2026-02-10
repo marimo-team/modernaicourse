@@ -12,7 +12,7 @@
 
 import marimo
 
-__generated_with = "0.19.7"
+__generated_with = "0.19.9"
 app = marimo.App()
 
 with app.setup(hide_code=True):

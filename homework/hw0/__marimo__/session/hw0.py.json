@@ -1,0 +1,531 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.19.7"
+  },
+  "cells": [
+    {
+      "id": "Hbol",
+      "code_hash": "1b103245247673ca9ba549d1842cddea",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"homework-0\">Homework 0</h2>\n<span class=\"paragraph\">This homework is different from the other assignments in this course, in that we don't actually build anything related to AI or chatbots.  Instead, this is a basic assignment meant to test two things:</span>\n<ol>\n<li>Getting set up with our mugrade autograding systems, and</li>\n<li>Evaluating some basic background in programming and math proficiency, of the kind you'll be expected to need for this course.</li>\n</ol>\n<span class=\"paragraph\">If you can complete this assignment relatively easily, it is a good sign that your background will be sufficient for the course.  If the assignment is particularly challenging, then this might be a good indication that you would benefit from additional background before taking the course.  It's definitely not impossible to take the course while simultaneously building up this background, but it's likely going to be quite a bit harder.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "5354413ad6664aa6b4b2daafc6af2ff2",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"basic-notebook-setup\">Basic notebook setup</h3>\n<span class=\"paragraph\">This assignment uses the <a href=\"https://docs.marimo.io\" rel=\"noopener noreferrer\" target=\"_blank\">marimo notebook</a>, an alternative to the Jupyter notebook\nthat was developed in 2022 in collaboration with scientists at Stanford. Like\nJupyter, marimo is open-source, but unlike Jupyter is is a <em>reactive</em> notebook,\nkeeping code and outputs in sync.</span>\n<span class=\"paragraph\">Using marimo is optional. You can run marimo in molab, an online service\nsimilar to Google Colab, or locally. You will implement homework functions\nin this notebook, then test your implementations, first locally and then by\nsubmitting to the autograder.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "bf0d85f417aee83f2fdbb4cff91133ba",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"problem-1-mugrade-setup-via-simple-addition\">Problem 1: Mugrade setup (via simple addition)</h3>\n<span class=\"paragraph\">The first problem in this homework mainly serves to introduce you to the <a href=\"https://mugrade.org\" rel=\"noopener noreferrer\" target=\"_blank\">mugrade</a> grading system.  To access the mugrade system:</span>\n<ol>\n<li>Visit the mugrade enrollment link shared in Ed (or shared in the email we will send to the online course participants).</li>\n<li>Sign in using the Google account associated with your <em>CMU Andrew email</em> (for the CMU in-person course, for the online course you can use any email).</li>\n</ol>\n<span class=\"paragraph\">After you have set up your mugrade account and enrolled in the class, you should see a page for the course and the available assignments.  There is also a \"Show API Key\" button at the top of the page.  To submit assignments, copy this key and enter it into the cell of the notebook.</span>\n<span class=\"paragraph\">[Note: Please don't share your API key with others.  If any of you are (properly) horrified at the idea of storing an API key in the plain text of a notebook, you're welcome to add a <code>MUGRADE_KEY</code> environmental variable using any technique that will properly set the environment of the notebook.  For simplicity, and because you can't do much other than submit assignments with these keys, we're taking the simple (insecure) approach are just storing it in the notebook.]</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "18e399bb5a1257d1759b2a1f193f90a8",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">Once this account is set up, let's see how to submit an assignment.  Consider implementing the following function, which adds together its two arguments.  In general, the functions you implement in homework will be provided like this, giving you a signature of the function (or Python class).  Your job will be to implement the block within the comments:\n<div class=\"language-python codehilite\"><pre><span></span><code><span class=\"c1\">### BEGIN YOUR CODE</span>\n\n<span class=\"c1\">### END YOUR CODE</span>\n</code></pre></div>\nThis is not too challenging an implementation, and in fact we'll tell you that the correct solution to this assignment is simply to replace the <code>pass</code> code with <code>return x+y</code>.  You can fill this out in the implementation below.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Xref",
+      "code_hash": "2ca57e3b8bce6062859ce0b9683a0f2e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">The next cell runs <em>unit tests</em> for the <code>add</code> function, checking the correctness\nof the function you just implemented. You can take a look at these unit tests by\nexpanding the code of the next cell.</span>\n<span class=\"paragraph\">By default, changing the code of the <code>add</code> function will automatically run these local tests.\nBecause this function starts without an implementation, the tests all fail initially.\nUse these local tests to guide your implementation until all the tests pass.\nNote that passing the local test cases definitely doesn't guarantee correctness\nof the function, but it should hopefully provide a sanity check.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "BYtC",
+      "code_hash": "4391bb551506f7c6addcafc3c7d7fa93",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><em>After</em> you pass all the local tests succesfully, you should submit your solution to mugrade. You can do this by simply clicking the <code>submit</code> button below.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "emfo",
+      "code_hash": "7d8f57a3126d57cb2afb9a79c629a947",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">If all goes correctly, you should see feedback that the grader tests\npassed.  And when you view the mugrade site (you may need to refresh), you\nshould see the assignment as being submitted correctly.  If anything goes\nwrong, you should see an error code that indicates if there is any obvious\nproblem (for instance, if you didn't set the <code>MUGRADE_KEY</code> value above).\nHowever, in general when you fail a submission we <em>don't</em> provide very much\nfeedback, because the goal is for you to use the local tests to debug your\nassignment, and the submission just to submit the final version.</span>\n<span class=\"paragraph\"><strong>For the CMU course only (not needed for online course):</strong> After you have\nsubmitted <em>all</em> the assignments for the course, you should additionally\nupload the notebook itself: download the notebook from molab, and upload it\nto mugrade using the \"Upload Code\" link at the bottom of the page\nassignment page.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Hstk",
+      "code_hash": "253b7725169b0905b52d3dca1848bbb8",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><details>\n<summary>How mugrade works</summary>\n\n<span class=\"paragraph\">Note: for those who want a bit more information about how mugrade works, and how it differs from other autograding systems, we'll provide a bit of info here, but understanding this is not required in anyway way for the course.  Most autograding systems work by uploading your code and running it on the grading server; this ensures that your code runs independently and functions as desired, but has the notable downside that, for complex assignments, it can be difficult to ensure that the environment of the autograder is sufficiently similar to your own environment.  Countless hours have been wasted by students trying to trace the exact way in which the autograding environment differs from their own.  This is especially a problem for machine learning assignments where GPUs are required to run the code, and we know of very few systems that handle this setup in a seamless fashion.</span>\n\n<span class=\"paragraph\">\nThis has led us to develop mugrade, which takes the different philosophy, runs\nall the autograding code _on your local system_ (or on molab), and then just\nsends the _answer_ to mugrade to check against a reference solution.  The upside\nis that we can support large courses with relatively little overhead.  The\ndownside is that it does allow cheating of some type: you absolutely could\ncompute the solutions manually for each mugrade test case and then submit those\nanswers to get full points.  And this would almost certainly be more\ntime-consuming than just solving the problem to begin with.  So in a world where\nmost assignments can be solved by AI anyway, it seems a very reasonable\ntrade-off to give a bit more control to students of their coding environment, at\nthe cost of possibly introducing slightly more ability to game the system.  This\nis why, as a final measure, we ask for all students to upload a copy of their\nassignment, so TA's can check it as needed.\n</span>\n\n</details></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "nWHF",
+      "code_hash": "a17d01d1de9eacc2c6f988052b59ec12",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"problem-2-computing-primes\">Problem 2: Computing primes</h3>\n<span class=\"paragraph\">As the first \"real\" problem of this assignment, you'll have to write a simple routine to compute prime numbers.  You will specifically do this using a method called the <a href=\"https://en.wikipedia.org/wiki/Sieve_of_Eratosthenes\" rel=\"noopener noreferrer\" target=\"_blank\">Sieve of Eratosthenes</a>, which computes <em>all</em> prime numbers up to some number <marimo-tex class=\"arithmatex\">||(n||)</marimo-tex> by iteratively setting elements of an array to <code>False</code> if they cannot be a prime because they are a multiple of another number.  The <a href=\"https://en.wikipedia.org/wiki/Sieve_of_Eratosthenes#Pseudocode\" rel=\"noopener noreferrer\" target=\"_blank\">pseudocode</a> of the algorithm on the Wikipedia link above provides a pretty reasonable description of the algorithm.  As mentioned above, this particular function has nothing to do with machine learning or the rest of the course, but it is a nice demonstration of an algorithm to implement in Python, that is a good test of your general basic proficiency.</span>\n<span class=\"paragraph\">Using this pseudocode as a reference point (but note that you <em>don't</em> have to follow it exactly), plus the function signature below (which you <em>do</em> need to follow exactly), implement a method for computing primes using this method.  Note that even though the algorithm computes a binary array of which numbers are prime, the function as defined below needs to return a list of just the prime numbers, so you'll need to convert to that format.</span>\n<span class=\"paragraph\">For this function, you'll want to first run the <code>@mugrade.local_tests</code> test cases, then change this to <code>@mugrade.submit</code> once you have finished and debugged your implementation.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "TqIu",
+      "code_hash": "5d7eb0992f93f2d006949c19a6835242",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"problem-3-operations-on-polynomials\">Problem 3: Operations on polynomials</h3>\n<span class=\"paragraph\">As a last problem in this assignment, you will write code to manipulate polynomials represented by a Python class.  Again, this assignment is not directly relevant to much AI work, but it <em>does</em> serve as a useful evaluation of your familiarity with some basic mathematical concepts, how you translate these into Python work, and in working with existing Python classes.</span>\n<span class=\"paragraph\">The <code>Polynomial</code> class implemented below contains a basic representation of polynomials via a list of their coefficients.  Each class contains a <code>.coefficients</code> member, which is a list where <code>coefficients[i]</code> represents the coefficient on the <marimo-tex class=\"arithmatex\">||(i||)</marimo-tex>th degree term, <marimo-tex class=\"arithmatex\">||(x^i||)</marimo-tex>.  In other words, the list\n<div class=\"language-python codehilite\"><pre><span></span><code><span class=\"n\">coefficients</span> <span class=\"o\">=</span> <span class=\"p\">[</span><span class=\"mi\">1</span><span class=\"p\">,</span> <span class=\"mi\">0</span><span class=\"p\">,</span> <span class=\"mi\">4</span><span class=\"p\">,</span> <span class=\"mi\">3</span><span class=\"p\">]</span>\n</code></pre></div>\nwould represent the polynomial</span>\n<marimo-tex class=\"arithmatex\">||[3x^3 + 4x^2 + 1,||]</marimo-tex><span class=\"paragraph\">the list\n<div class=\"language-python codehilite\"><pre><span></span><code><span class=\"n\">coefficients</span> <span class=\"o\">=</span> <span class=\"p\">[</span><span class=\"mi\">4</span><span class=\"p\">,</span> <span class=\"mi\">3</span><span class=\"p\">,</span> <span class=\"mi\">5</span><span class=\"p\">]</span>\n</code></pre></div>\nwould represent the polynomial</span>\n<marimo-tex class=\"arithmatex\">||[5x^2 + 3x + 4,||]</marimo-tex><span class=\"paragraph\">and so on.  Any term of degree beyond the length of the list implicitly has coefficient zero.</span>\n<span class=\"paragraph\">The class below contains the basic implementation (which is quite sparse, other than a few helper functions and a function that returns a string representation of the polynomial).  Note that you should <em>not</em> change any of this code in the assignment.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "DnEU",
+      "code_hash": "89b8b5b7af8b39fcb392406b963fa2b9",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">To get a sense of how this code works, you can test out forming some basic polynomials as is done in the cell below:</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ulZA",
+      "code_hash": "e43ec3ed55bb6f4c97c1a59882fa36be",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h4 id=\"problem-3a-polynomial-additiona\">Problem 3a: Polynomial additiona</h4>\n<span class=\"paragraph\">Write the code to add together two polynomials.  Adding polynomials just involves adding the respective coefficients of the same degree.  For example, if you had two polynomials</span>\n<marimo-tex class=\"arithmatex\">||[p_1(x) = 3x^3 + 4x^2 + 3, \\quad p_2(x) = x^2 + 5x + 5||]</marimo-tex><span class=\"paragraph\">then</span>\n<marimo-tex class=\"arithmatex\">||[p_1(x) + p_2(x) = 3x^3 + 5x^2 + 5x + 8.||]</marimo-tex><span class=\"paragraph\">Implement this logic in the function below.  Note that the \"only\" thing that's required to implement this is to construct a new set off polynomial coefficients corresponding to the addition, and return a new polynomial constructed from these coefficients.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "nHfw",
+      "code_hash": "d099d6c121b4da4a34f16de0f4e20394",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h4 id=\"problem-3b-polynomial-multiplication\">Problem 3b: Polynomial multiplication</h4>\n<span class=\"paragraph\">Next implement a function that multiplies together two polynomials.  Multiplying polynomials involves multipling every term in the first polynomial with every term in the second, and adding together the results.  For example, for the polynomials</span>\n<marimo-tex class=\"arithmatex\">||[p_1(x) = 3x^3 + 2x + 3, \\quad p_2(x) = 2x^2 + 5||]</marimo-tex><span class=\"paragraph\">their multiplication is given by</span>\n<marimo-tex class=\"arithmatex\">||[\\begin{split} p_1(x) \\cdot p_2(x) &amp; = (3x^3 + 2x + 3) \\cdot 2x^2 + (3x^3 + 2x + 3) \\cdot 5 \\\\\n&amp; = (6x^5 + 4x^3 + 6x^2) + (15x^3 + 10x + 15) \\\\ &amp; = 6x^5 + 19x^3 + 6x^2 + 10x + 15\\end{split}.||]</marimo-tex><span class=\"paragraph\">Implement this logic in the function below.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "aqbW",
+      "code_hash": "fc4fb3b5d71c9be0d67362ce95b2597b",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h4 id=\"problem-3c-polynomial-differentiation\">Problem 3c: Polynomial differentiation</h4>\n<span class=\"paragraph\">For the final question, you should implement a function the computes the derivative of the polynomial with respect to <marimo-tex class=\"arithmatex\">||(x||)</marimo-tex>.  You should be familiar with the basic rules of derivatives in order to compute this, but as an example, if we have the polynomial</span>\n<marimo-tex class=\"arithmatex\">||[p(x) = 4x^3 + 3x + x||]</marimo-tex><span class=\"paragraph\">then the derivative of <marimo-tex class=\"arithmatex\">||(p(x)||)</marimo-tex> with respect to <marimo-tex class=\"arithmatex\">||(x||)</marimo-tex>, which we denote as <marimo-tex class=\"arithmatex\">||(p'(x)||)</marimo-tex>, is given by</span>\n<marimo-tex class=\"arithmatex\">||[p'(x) = 12x^2 + 3||]</marimo-tex><span class=\"paragraph\">where in general the derivative of any term <marimo-tex class=\"arithmatex\">||(c x^n||)</marimo-tex> is given by <marimo-tex class=\"arithmatex\">||(ncx^{n-1}||)</marimo-tex> and the of any constant term <marimo-tex class=\"arithmatex\">||(c||)</marimo-tex> is zero.</span>\n<span class=\"paragraph\">Implement this logic in the function below.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "setup",
+      "code_hash": "62663c4b827970ee71ab19ae7abf3460",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stderr",
+          "text": "File \u2018hw0_tests.py\u2019 already there; not retrieving.\n\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "9c414759af74f80eddc3e569af352b10",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": "015051cc4946c85149b3910cca6ffa62",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SFPL",
+      "code_hash": "af5060cca6df4c566fe118649f018354",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "\u001b[31mF\u001b[0m\u001b[31mF\u001b[0m\u001b[31mF\u001b[0m\u001b[31m                                                                      [100%]\u001b[0m\n=================================== FAILURES ===================================\n\u001b[31m\u001b[1m_______________________________ test_add[5-6-11] _______________________________\u001b[0m\n\nx = 5, y = 6, z = 11\n\n    @pytest.mark.parametrize(\n        (\"x\", \"y\", \"z\"),\n        [\n            (5, 6, 11),\n            (2.1, 2.3, 4.4),\n        ],\n    )\n    def test_add(x, y, z):\n>       assert add(x, y) == z\n\u001b[1m\u001b[31mE       assert None == 11\u001b[0m\n\u001b[1m\u001b[31mE        +  where None = add(5, 6)\u001b[0m\n\n\u001b[1m\u001b[31mmarimo://hw0.py#cell_id=cell\u001b[0m:9: AssertionError\n\u001b[31m\u001b[1m____________________________ test_add[2.1-2.3-4.4] _____________________________\u001b[0m\n\nx = 2.1, y = 2.3, z = 4.4\n\n    @pytest.mark.parametrize(\n        (\"x\", \"y\", \"z\"),\n        [\n            (5, 6, 11),\n            (2.1, 2.3, 4.4),\n        ],\n    )\n    def test_add(x, y, z):\n>       assert add(x, y) == z\n\u001b[1m\u001b[31mE       assert None == 4.4\u001b[0m\n\u001b[1m\u001b[31mE        +  where None = add(2.1, 2.3)\u001b[0m\n\n\u001b[1m\u001b[31mmarimo://hw0.py#cell_id=cell\u001b[0m:9: AssertionError\n\u001b[31m\u001b[1m________________________________ test_add_type _________________________________\u001b[0m\n\n    def test_add_type():\n>       assert isinstance(add(4, 2.1), float)\n\u001b[1m\u001b[31mE       assert False\u001b[0m\n\u001b[1m\u001b[31mE        +  where False = isinstance(None, float)\u001b[0m\n\u001b[1m\u001b[31mE        +    where None = add(4, 2.1)\u001b[0m\n\n\u001b[1m\u001b[31mmarimo://hw0.py#cell_id=cell\u001b[0m:12: AssertionError\n=================================== Overview ===================================\n\nSummary:\nTotal: 3, Passed: 0, Failed: 3, Errors: 0, Skipped: 0\n\u001b[36m\u001b[1m=========================== short test summary info ============================\u001b[0m\n\u001b[31mFAILED\u001b[0m hw0.py::\u001b[1mtest_add[5-6-11]\u001b[0m - assert None == 11\n\u001b[31mFAILED\u001b[0m hw0.py::\u001b[1mtest_add[2.1-2.3-4.4]\u001b[0m - assert None == 4.4\n\u001b[31mFAILED\u001b[0m hw0.py::\u001b[1mtest_add_type\u001b[0m - assert False\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "RGSE",
+      "code_hash": "5bc00cf69bcc7c696360b41bb3a73efa",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='RGSE-0' random-id='f744b70e-8e7a-1751-88fc-166780be8fcc'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;add&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Kclp",
+      "code_hash": "3efd4622dfa6ef866a4a30b07e8f412e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "iLit",
+      "code_hash": "de7d4df3e61454f4034e61e817dd90d7",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ZHCJ",
+      "code_hash": "4918fb835c82579de3e53a25035c766b",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "\u001b[31mF\u001b[0m\u001b[31m                                                                        [100%]\u001b[0m\n=================================== FAILURES ===================================\n\u001b[31m\u001b[1m_______________________________ .hw0.test_primes _______________________________\u001b[0m\n\n    def test_primes():\n        p = primes(10)\n>       assert isinstance(p, list)\n\u001b[1m\u001b[31mE       assert False\u001b[0m\n\u001b[1m\u001b[31mE        +  where False = isinstance(None, list)\u001b[0m\n\n\u001b[1m\u001b[31mmarimo://hw0.py#cell_id=cell\u001b[0m:3: AssertionError\n=================================== Overview ===================================\n\nSummary:\nTotal: 1, Passed: 0, Failed: 1, Errors: 0, Skipped: 0\n\u001b[36m\u001b[1m=========================== short test summary info ============================\u001b[0m\n\u001b[31mFAILED\u001b[0m .::\u001b[1mtest_primes\u001b[0m - assert False\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "ROlb",
+      "code_hash": "b7c00824e9cac9f4c13caac547c276a8",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='ROlb-0' random-id='9f803c2a-1041-343d-9465-dea82c05ffe7'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;primes&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "qnkX",
+      "code_hash": "60de454f2290337dbff20f2483c715d6",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Vxnm",
+      "code_hash": "4c7e470e33e3a7baceaeafc7074a589a",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ecfG",
+      "code_hash": "951788b651091f4f748de2a436fce06c",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Pvdt",
+      "code_hash": "9403df861b77c18271ea0e7707c5a5ec",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "\u001b[31mF\u001b[0m\u001b[31m                                                                        [100%]\u001b[0m\n=================================== FAILURES ===================================\n\u001b[31m\u001b[1m______________________________ .hw0.test_poly_add ______________________________\u001b[0m\n\n    def test_poly_add():\n        p1 = Polynomial([1, 5, 0, 5])\n        p2 = Polynomial([0, 2])\n        p3 = Polynomial([-1, 6, 7, -5])\n        p4 = Polynomial([0.3, 0.4, 1.6, 1.9])\n>       assert poly_add(p1, p2) == Polynomial([1, 7, 0, 5])\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n\u001b[1m\u001b[31mmarimo://hw0.py#cell_id=cell\u001b[0m:6: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nself = 5x^3 + 7x + 1, value = None\n\n    def __eq__(self, value):\n        \"\"\"Check if two polynomials are equal\"\"\"\n>       return self.coefficients == value.coefficients\n                                    ^^^^^^^^^^^^^^^^^^\n\u001b[1m\u001b[31mE       AttributeError: 'NoneType' object has no attribute 'coefficients'\u001b[0m\n\n\u001b[1m\u001b[31mmarimo://hw0.py#cell_id=cell\u001b[0m:20: AttributeError\n=================================== Overview ===================================\n\nSummary:\nTotal: 1, Passed: 0, Failed: 1, Errors: 0, Skipped: 0\n\u001b[36m\u001b[1m=========================== short test summary info ============================\u001b[0m\n\u001b[31mFAILED\u001b[0m .::\u001b[1mtest_poly_add\u001b[0m - AttributeError: 'NoneType' object has no attribute 'coefficients'\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "ZBYS",
+      "code_hash": "78e870cfe13bcb36f1610ddd9da4c5da",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='ZBYS-0' random-id='f54fd6fa-69a7-3c68-d287-de046fdb75b8'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;poly_add&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "aLJB",
+      "code_hash": "03773cefebfc845539b0b9a02253a5e7",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "xXTn",
+      "code_hash": "622e0995bf8dc2ed9809090210332480",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "AjVT",
+      "code_hash": "64efbbce78ec9cd5edadecee3c3c81bf",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "\u001b[31mF\u001b[0m\u001b[31m                                                                        [100%]\u001b[0m\n=================================== FAILURES ===================================\n\u001b[31m\u001b[1m______________________________ .hw0.test_poly_mul ______________________________\u001b[0m\n\n    def test_poly_mul():\n        p1 = Polynomial([1, 5, 0, 5])\n        p2 = Polynomial([0, 2])\n        p3 = Polynomial([-1, 6, 7, -5])\n        p4 = Polynomial([0.3, 0.4, 1.6, 1.9])\n>       assert poly_mul(p1, p2) == Polynomial([0, 2, 10, 0, 10])\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n\u001b[1m\u001b[31mmarimo://hw0.py#cell_id=cell\u001b[0m:6: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nself = 10x^4 + 10x^2 + 2x, value = None\n\n    def __eq__(self, value):\n        \"\"\"Check if two polynomials are equal\"\"\"\n>       return self.coefficients == value.coefficients\n                                    ^^^^^^^^^^^^^^^^^^\n\u001b[1m\u001b[31mE       AttributeError: 'NoneType' object has no attribute 'coefficients'\u001b[0m\n\n\u001b[1m\u001b[31mmarimo://hw0.py#cell_id=cell\u001b[0m:20: AttributeError\n=================================== Overview ===================================\n\nSummary:\nTotal: 1, Passed: 0, Failed: 1, Errors: 0, Skipped: 0\n\u001b[36m\u001b[1m=========================== short test summary info ============================\u001b[0m\n\u001b[31mFAILED\u001b[0m .::\u001b[1mtest_poly_mul\u001b[0m - AttributeError: 'NoneType' object has no attribute 'coefficients'\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "pHFh",
+      "code_hash": "737bbe2a879bdd216617c23c7115dbbc",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='pHFh-0' random-id='23b84b2a-5e6b-45c7-8df1-e924b3c2b68c'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;poly_mul&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "NCOB",
+      "code_hash": "0839e0f62ca855590b6c5321b9a75a46",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "TRpd",
+      "code_hash": "7f7ae6056046a32201f4b81cf3eace7c",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "TXez",
+      "code_hash": "0035af1a70b4cb28ffe0aebca4eaf376",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "\u001b[31mF\u001b[0m\u001b[31m                                                                        [100%]\u001b[0m\n=================================== FAILURES ===================================\n\u001b[31m\u001b[1m__________________________ .hw0.test_poly_derivative ___________________________\u001b[0m\n\n    def test_poly_derivative():\n        p1 = Polynomial([1, 5, 0, 5])\n        p2 = Polynomial([0.3, 0.4, 1.6])\n>       assert poly_derivative(p1) == Polynomial([5, 0, 15])\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n\u001b[1m\u001b[31mmarimo://hw0.py#cell_id=cell\u001b[0m:4: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nself = 15x^2 + 5, value = None\n\n    def __eq__(self, value):\n        \"\"\"Check if two polynomials are equal\"\"\"\n>       return self.coefficients == value.coefficients\n                                    ^^^^^^^^^^^^^^^^^^\n\u001b[1m\u001b[31mE       AttributeError: 'NoneType' object has no attribute 'coefficients'\u001b[0m\n\n\u001b[1m\u001b[31mmarimo://hw0.py#cell_id=cell\u001b[0m:20: AttributeError\n=================================== Overview ===================================\n\nSummary:\nTotal: 1, Passed: 0, Failed: 1, Errors: 0, Skipped: 0\n\u001b[36m\u001b[1m=========================== short test summary info ============================\u001b[0m\n\u001b[31mFAILED\u001b[0m .::\u001b[1mtest_poly_derivative\u001b[0m - AttributeError: 'NoneType' object has no attribute 'coefficients'\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "dNNg",
+      "code_hash": "157fde448c450fb093b16fde0cd04f86",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='dNNg-0' random-id='0da25311-4ab0-ade5-60a4-4fa2c31ba875'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;poly_derivative&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "yCnT",
+      "code_hash": "0331a5209a5f15760f28a5833842febe",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    }
+  ]
+}
