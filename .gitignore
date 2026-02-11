@@ -204,5 +204,6 @@ cython_debug/
 # Marimo
 marimo/_static/
 marimo/_lsp/
+__marimo__/
 **/__marimo__/cache/
 **__ipynb__/
