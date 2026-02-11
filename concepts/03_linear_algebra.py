@@ -87,12 +87,25 @@ def plot_vectors(vectors, colors, labels, title="", ax=None):
             "",
             xy=(vx, vy),
             xytext=(0, 0),
-            arrowprops=dict(arrowstyle="->,head_width=0.3,head_length=0.2", color=color, lw=2),
+            arrowprops=dict(
+                arrowstyle="->,head_width=0.3,head_length=0.2",
+                color=color,
+                lw=2,
+            ),
         )
         # Offset label away from origin so it doesn't overlap the arrow
         _norm = (vx**2 + vy**2) ** 0.5 or 1.0
         _ox, _oy = 0.25 * vx / _norm, 0.25 * vy / _norm
-        ax.text(vx + _ox, vy + _oy, label, fontsize=12, color=color, fontweight="bold", ha="center", va="center")
+        ax.text(
+            vx + _ox,
+            vy + _oy,
+            label,
+            fontsize=12,
+            color=color,
+            fontweight="bold",
+            ha="center",
+            va="center",
+        )
     all_coords = [float(c) for vec in vectors for c in vec]
     bound = max(abs(c) for c in all_coords) + 1.5
     ax.set_xlim(-bound, bound)
@@ -127,15 +140,45 @@ def _(v, w):
     _fig, (_ax1, _ax2) = plt.subplots(1, 2, figsize=(10, 5))
 
     # Addition
-    plot_vectors([v, w, v + w], ["#4c78a8", "#e45756", "#54a24b"], ["v", "w", "v+w"], title="Addition", ax=_ax1)
+    plot_vectors(
+        [v, w, v + w],
+        ["#4c78a8", "#e45756", "#54a24b"],
+        ["v", "w", "v+w"],
+        title="Addition",
+        ax=_ax1,
+    )
     # Parallelogram dashed lines
-    _ax1.plot([float(v[0]), float((v + w)[0])], [float(v[1]), float((v + w)[1])], "--", color="#999", lw=1)
-    _ax1.plot([float(w[0]), float((v + w)[0])], [float(w[1]), float((v + w)[1])], "--", color="#999", lw=1)
+    _ax1.plot(
+        [float(v[0]), float((v + w)[0])],
+        [float(v[1]), float((v + w)[1])],
+        "--",
+        color="#999",
+        lw=1,
+    )
+    _ax1.plot(
+        [float(w[0]), float((v + w)[0])],
+        [float(w[1]), float((v + w)[1])],
+        "--",
+        color="#999",
+        lw=1,
+    )
 
     # Subtraction
-    plot_vectors([v, w, v - w], ["#4c78a8", "#e45756", "#f58518"], ["v", "w", "v-w"], title="Subtraction", ax=_ax2)
+    plot_vectors(
+        [v, w, v - w],
+        ["#4c78a8", "#e45756", "#f58518"],
+        ["v", "w", "v-w"],
+        title="Subtraction",
+        ax=_ax2,
+    )
     # Dashed line from w to v (v - w points from w to v)
-    _ax2.plot([float(w[0]), float(v[0])], [float(w[1]), float(v[1])], "--", color="#999", lw=1)
+    _ax2.plot(
+        [float(w[0]), float(v[0])],
+        [float(w[1]), float(v[1])],
+        "--",
+        color="#999",
+        lw=1,
+    )
 
     _fig.tight_layout()
     plt.gca()
@@ -376,7 +419,9 @@ def _(matrix_widget):
     _ax1.set_title("Original", fontsize=13)
 
     # Transformed
-    _ax2.plot(_transformed[0].numpy(), _transformed[1].numpy(), color="#4c78a8", lw=2)
+    _ax2.plot(
+        _transformed[0].numpy(), _transformed[1].numpy(), color="#4c78a8", lw=2
+    )
     plot_vectors([_Me1, _Me2], ["#e45756", "#54a24b"], ["Me₁", "Me₂"], ax=_ax2)
     _ax2.set_title("Transformed", fontsize=13)
 
@@ -414,10 +459,12 @@ def _():
 def _(v):
     # Rotate v by 45 degrees
     _angle = torch.tensor(torch.pi / 4)
-    R = torch.tensor([
-        [torch.cos(_angle), -torch.sin(_angle)],
-        [torch.sin(_angle),  torch.cos(_angle)],
-    ])
+    R = torch.tensor(
+        [
+            [torch.cos(_angle), -torch.sin(_angle)],
+            [torch.sin(_angle), torch.cos(_angle)],
+        ]
+    )
     v_rotated = R @ v
 
     _fig, _ax = plt.subplots(figsize=(5, 5))
