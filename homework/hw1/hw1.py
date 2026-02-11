@@ -1,4 +1,5 @@
 # /// script
+# requires-python = ">=3.14"
 # dependencies = [
 #     "marimo",
 #     "numpy==2.4.1",
@@ -67,7 +68,7 @@ def _():
 
     This homework is aimed to familiarize you with some of the basic linear algebra operations we covered in class, as well as how to implement these functions and more in PyTorch.
 
-    As before, make a copy of the assignment to your drive, add your mugrade key, and then run the cells below to get started.
+    As before, add your mugrade key below and then run the cells below to get started.
     """)
     return
 
