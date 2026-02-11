@@ -46,6 +46,7 @@ Each concept notebook is associated with a lecture.
 
 - [HW 0: Autograding and programming basics](https://molab.marimo.io/github/marimo-team/modernaicourse/blob/main/homework/hw0/hw0.py)
 - [HW 1: Introduction to linear algebra and PyTorch](https://molab.marimo.io/github/marimo-team/modernaicourse/blob/main/homework/hw1/hw1.py)
+- [HW 2: Automatic differentiation and training a linear model](https://molab.marimo.io/github/marimo-team/modernaicourse/blob/main/homework/hw2/hw2.py)
 
 ## About the course
 
