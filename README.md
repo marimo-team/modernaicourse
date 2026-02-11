@@ -39,13 +39,13 @@ Each concept notebook is associated with a lecture.
 
 | Lecture | Notebook |
 | ------- | ---------- |
-| [Lecture 2: Intro to supervised machine learning](https://www.youtube.com/watch?v=xIQkf7ZGQhM) | [![Open in molab](https://marimo.io/molab-shield.svg)](https://molab.marimo.io/notebooks/nb_QkLTb6Gsw53HVaDGBcjaf2)
-| [Lecture 3: Linear Algebra](https://youtu.be/tlbLH77GFLQ?si=3DSmmVXzqxIJrHUP) | [![Open in molab](https://marimo.io/molab-shield.svg)](https://molab.marimo.io/notebooks/nb_QVz6zuXtJLU2hqEp2dp2j3)
+| [Lecture 2: Intro to supervised machine learning](https://www.youtube.com/watch?v=xIQkf7ZGQhM) | [![Open in molab](https://marimo.io/molab-shield.svg)](https://molab.marimo.io/github/marimo-team/modernaicourse/blob/main/concepts/02_supervised_learning.py)
+| [Lecture 3: Linear Algebra](https://youtu.be/tlbLH77GFLQ?si=3DSmmVXzqxIJrHUP) | [![Open in molab](https://marimo.io/molab-shield.svg)](https://molab.marimo.io/github/marimo-team/modernaicourse/blob/main/concepts/03_linear_algebra.py)
 
 ## Homework
 
-- [HW 0: Autograding and programming basics](https://molab.marimo.io/github.com/marimo-team/modernaicourse/blob/main/homework/hw0/hw0.py)
-- [HW 1: Introduction to linear algebra and PyTorch](https://molab.marimo.io/github.com/marimo-team/modernaicourse/blob/main/homework/hw1/hw1.py)
+- [HW 0: Autograding and programming basics](https://molab.marimo.io/github/marimo-team/modernaicourse/blob/main/homework/hw0/hw0.py)
+- [HW 1: Introduction to linear algebra and PyTorch](https://molab.marimo.io/github/marimo-team/modernaicourse/blob/main/homework/hw1/hw1.py)
 
 ## About the course
 
