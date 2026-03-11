@@ -1,0 +1,781 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.20.4",
+    "script_metadata_hash": "845cb5ce3dcb38df36e3eb032b046444"
+  },
+  "cells": [
+    {
+      "id": "Hbol",
+      "code_hash": "5d4be4b7f6152f329bfed4cb4b372db3",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"homework-3-training-models-in-pytorch\">Homework 3 - Training models in PyTorch</h2>\n<span class=\"paragraph\">In this homework, you will implement the basic components of training ML models in PyTorch.  Unlike in the previous homework where you implemented the gradient computation manually and wrote your own training loop \"from scratch\" (in the sense that you didn't use modules, optimizers, etc), this homework will implement the more \"standard\" approach to training models in PyTorch.  Specifically, you will implement the following components:</span>\n<ol>\n<li>A <code>Linear</code> layer as a <code>Module</code> subclass</li>\n<li>A <code>CrossEntropyLoss</code> module</li>\n<li>A <code>SGD</code> optimizer</li>\n<li>A <code>DataLoader</code> class</li>\n<li>An <code>epoch</code> function that runs one pass over the data</li>\n</ol>\n<span class=\"paragraph\">You will then use these components to train a linear model on the MNIST dataset, and then extend this to train a two-layer and multi-layer neural network.</span>\n<span class=\"paragraph\"><strong>Important</strong>: For this assignment, you should use the <code>Module</code> and <code>Parameter</code> classes from <code>torch.nn</code>, but you should <em>not</em> use any of the built-in layer, loss, or optimizer implementations from <code>torch.nn</code> or <code>torch.optim</code> (i.e., don't use <code>torch.nn.Linear</code>, <code>torch.nn.CrossEntropyLoss</code>, <code>torch.optim.SGD</code>, etc.).  The goal is for you to implement these yourself using only basic PyTorch tensor operations.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "15ff5803399493dd262a465a1501c1a8",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"part-i-training-a-linear-model\">Part I. Training a linear model</h2></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "94e43806aa0ecf4c13c420433a9efd52",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"question-1-linear-layer\">Question 1. Linear layer</h3>\n<span class=\"paragraph\">Implement a linear layer as a <code>Module</code> subclass.  The layer should have a single <code>.weight</code> parameter (a <code>Parameter</code> object) of shape <code>out_dim x in_dim</code>.  The weight should be initialized to random Gaussian values scaled by <marimo-tex class=\"arithmatex\">||(\\sqrt{2 / \\text{in\\_dim}}||)</marimo-tex> (i.e., <code>torch.randn(out_dim, in_dim) * math.sqrt(2 / in_dim)</code>).</span>\n<span class=\"paragraph\">The forward pass should compute the matrix multiplication <marimo-tex class=\"arithmatex\">||(X W^T||)</marimo-tex> where <marimo-tex class=\"arithmatex\">||(X||)</marimo-tex> is the input and <marimo-tex class=\"arithmatex\">||(W||)</marimo-tex> is the weight matrix.  Note that this should work for inputs of arbitrary batch dimensions (e.g., both 2D inputs of shape <code>(batch, in_dim)</code> and 3D inputs of shape <code>(batch1, batch2, in_dim)</code> should be supported).  You can use the <code>@</code> operator for matrix multiplication, which handles broadcasting automatically.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "BYtC",
+      "code_hash": "d1f5a2b4940361a08db60fe04f45e3f4",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"question-2-cross-entropy-loss\">Question 2 - Cross entropy loss</h3>\n<span class=\"paragraph\">Implement the cross entropy loss as a PyTorch <code>Module</code>.  Recall that the cross entropy loss is defined as</span>\n<marimo-tex class=\"arithmatex\">||[L_{ce}(\\hat{y}, y) = \\frac{1}{N} \\sum_{i=1}^N \\left ( -\\hat{y}_{i,y_i} + \\log \\sum_{j=1}^k \\exp \\hat{y}_{i,j} \\right )||]</marimo-tex><span class=\"paragraph\">where <marimo-tex class=\"arithmatex\">||(\\hat{y} \\in \\mathbb{R}^{N \\times k}||)</marimo-tex> are the logits and <marimo-tex class=\"arithmatex\">||(y \\in \\{0,\\ldots,k-1\\}^N||)</marimo-tex> are the targets.  You can use <code>torch.logsumexp</code> to compute the log-sum-exp term for numerical stability.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "nWHF",
+      "code_hash": "0646e24678cab291147508ccb8fa860d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"question-3-stochastic-gradient-descent\">Question 3 - Stochastic Gradient Descent</h3>\n<span class=\"paragraph\">Implement a simple SGD optimizer.  In PyTorch, the general paradigm for optimizers is as follows:</span>\n<ol>\n<li>Create an optimizer object, passing it the parameters of the model you want to optimize and a learning rate.</li>\n<li>In the training loop, you call <code>opt.zero_grad()</code> to zero out all gradients, compute the loss, call <code>loss.backward()</code> to compute gradients, and then call <code>opt.step()</code> to update the parameters.</li>\n</ol>\n<span class=\"paragraph\">The <code>SGD</code> class should implement this interface.  A few important notes:</span>\n<ul>\n<li>In <code>__init__</code>, you should store the parameters as a <strong>list</strong> (i.e., call <code>list()</code> on the parameters generator).  This is because <code>model.parameters()</code> returns a generator, and you need to iterate over it multiple times.</li>\n<li>In <code>step()</code>, you should update each parameter's <code>.data</code> attribute (not the parameter itself) using <code>torch.no_grad()</code> context manager, or alternatively just modify <code>.data</code> directly, since modifying <code>.data</code> doesn't track gradients.</li>\n<li>In <code>zero_grad()</code>, you should set each parameter's <code>.grad</code> to <code>None</code>.</li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "TqIu",
+      "code_hash": "cfac571360fc770fadf88c41dbdf54a1",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"question-4-data-loader\">Question 4 - Data Loader</h3>\n<span class=\"paragraph\">Implement a simple data loader class that iterates over a dataset in batches.  The class should implement the Python iterator protocol using <code>__iter__</code> and <code>__next__</code> methods.</span>\n<ul>\n<li><code>__init__</code> should store the data, labels, and batch size, and initialize any state needed for iteration.</li>\n<li><code>__iter__</code> should reset the iteration state and return <code>self</code> (so the loader can be used in a <code>for</code> loop and can be iterated multiple times).</li>\n<li><code>__next__</code> should return the next batch of <code>(X_batch, y_batch)</code> as a tuple.  When there are no more batches, it should raise <code>StopIteration</code>.  The last batch may be smaller than <code>batch_size</code> if the dataset size is not evenly divisible.</li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Pvdt",
+      "code_hash": "a26ff282b026cdefb241e62975e47af7",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"question-5-optimization-epoch\">Question 5 - Optimization epoch</h3>\n<span class=\"paragraph\">Implement an <code>epoch</code> function that runs one pass over the data.  The function takes a model, a data loader, a loss function, and an optional optimizer.</span>\n<ul>\n<li>If <code>opt</code> is provided (training mode): for each batch, zero the gradients, compute the model output, compute the loss, call <code>loss.backward()</code>, and take an optimizer step.</li>\n<li>If <code>opt</code> is <code>None</code> (evaluation mode): for each batch, compute the model output and loss without computing or updating gradients (use <code>torch.no_grad()</code>).</li>\n</ul>\n<span class=\"paragraph\">The function should return the average loss and average error rate over the entire dataset.  The error rate is the fraction of examples where the model's prediction (argmax of output) does not match the target.</span>\n<span class=\"paragraph\"><strong>Important</strong>: The average loss should be weighted by batch size (i.e., accumulate <code>loss * batch_size</code> and divide by total number of examples), and similarly for error.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "AjVT",
+      "code_hash": "03feeba10ce40143112602ab2c456de7",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">If you implemented all the problems above correctly, then the following two cells of code will load the data, and train a linear model on the MNIST training set.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "yCnT",
+      "code_hash": "cafc1f618e3c33cdf3480f61162931a0",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"part-ii-training-neural-networks\">Part II - Training Neural Networks</h2></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "wlCL",
+      "code_hash": "51d9b98e06c1ec08d7b9572622627388",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"question-6-two-layer-neural-network\">Question 6 - Two-layer neural network</h3>\n<span class=\"paragraph\">Implement a two-layer neural network as a <code>Module</code> subclass.  The network computes</span>\n<marimo-tex class=\"arithmatex\">||[h(x) = W_2 \\sigma(W_1 x)||]</marimo-tex><span class=\"paragraph\">where <marimo-tex class=\"arithmatex\">||(\\sigma||)</marimo-tex> is the ReLU activation function, <marimo-tex class=\"arithmatex\">||(W_1 \\in \\mathbb{R}^{\\text{hidden\\_dim} \\times \\text{in\\_dim}}||)</marimo-tex> and <marimo-tex class=\"arithmatex\">||(W_2 \\in \\mathbb{R}^{\\text{out\\_dim} \\times \\text{hidden\\_dim}}||)</marimo-tex>.</span>\n<span class=\"paragraph\">You should use the <code>Linear</code> class you implemented above as the building block.  The network should have two attributes <code>self.linear1</code> and <code>self.linear2</code> that are <code>Linear</code> layers.  Use <code>torch.relu</code> (or equivalently <code>torch.clamp(x, min=0)</code>) for the ReLU activation.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SdmI",
+      "code_hash": "dcdad8020527de9f043067c6a7fadff4",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">After you have implemented the layer, the following code will train this model.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "jxvo",
+      "code_hash": "102af380d663fdc5b17a663c33c79060",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"question-7-multi-layer-neural-network\">Question 7 - Multi-layer neural network</h3>\n<span class=\"paragraph\">Implement an arbitrary-depth multi-layer neural network with ReLU activations.  The network computes</span>\n<marimo-tex class=\"arithmatex\">||[h(x) = W_L \\sigma(W_{L-1} \\sigma(\\cdots \\sigma(W_1 x) \\cdots))||]</marimo-tex><span class=\"paragraph\">where <marimo-tex class=\"arithmatex\">||(L||)</marimo-tex> is the number of layers and <marimo-tex class=\"arithmatex\">||(\\sigma||)</marimo-tex> is ReLU.  You should use <code>ModuleList</code> to store the list of <code>Linear</code> layers (this ensures that PyTorch can find all the parameters when you call <code>model.parameters()</code>).</span>\n<span class=\"paragraph\">The <code>hidden_dims</code> argument is a list of integers specifying the sizes of the hidden layers.  For example, <code>MultiLayerNN(784, 10, [300, 200])</code> would create a network with layers of sizes <code>784 -&gt; 300 -&gt; 200 -&gt; 10</code>.</span>\n<span class=\"paragraph\">The network should have an attribute <code>self.linears</code> that is a <code>ModuleList</code> of <code>Linear</code> layers.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "tZnO",
+      "code_hash": "8acacf307cfee60b691d6fcd2e0ccc34",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">We won't require any further tests, but play around with a few different networks to see how low you can get the loss.  For example, you might try training a <code>MultiLayerNN</code> with different hidden layer configurations and learning rates.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "setup",
+      "code_hash": "214a7f9d793c265ca04dbd1e0feca76f",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stderr",
+          "text": "File \u2018hw3_tests.py\u2019 already there; not retrieving.\n\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "a07ed339f0e7445edf23c2e0883c0e27",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "f8b2ad31050f55ddc81a034af284be6d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": "5598f57028b46d5561ec1b4e26a41f36",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "\u001b[31mF\u001b[0m\u001b[31m                                                                        [100%]\u001b[0m\n=================================== FAILURES ===================================\n\u001b[31m\u001b[1m____________________________ .hw3.test_Linear_local ____________________________\u001b[0m\n\n    def test_Linear_local():\n>       test_Linear(Linear)\n\n\u001b[1m\u001b[31mmarimo://hw3.py#cell_id=cell\u001b[0m:2: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nLinear = <class '__main__.Linear'>\n\n    def test_Linear(Linear):\n        torch.manual_seed(0)\n        layer = Linear(10, 20)\n>       assert(hasattr(layer, \"weight\"))\n               ^^^^^^^^^^^^^^^^^^^^^^^^\n\u001b[1m\u001b[31mE       AssertionError\u001b[0m\n\n\u001b[1m\u001b[31mhw3_tests.py\u001b[0m:17: AssertionError\n=================================== Overview ===================================\n\nSummary:\nTotal: 1, Passed: 0, Failed: 1, Errors: 0, Skipped: 0\n\u001b[36m\u001b[1m=========================== short test summary info ============================\u001b[0m\n\u001b[31mFAILED\u001b[0m .::\u001b[1mtest_Linear_local\u001b[0m - AssertionError\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "Xref",
+      "code_hash": "36e81fc2119b21757d804198badea0ad",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='Xref-0' random-id='d2290e7c-caeb-d38c-cd66-78ca5b10c341'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;Linear&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SFPL",
+      "code_hash": "36ce8cc68d46877cceb8722681f63e27",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "RGSE",
+      "code_hash": "0430350f5eb6197b46e6404f7b28011a",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Kclp",
+      "code_hash": "6c6260d69a83def0006bd3b439e5f882",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "\u001b[31mF\u001b[0m\u001b[31m                                                                        [100%]\u001b[0m\n=================================== FAILURES ===================================\n\u001b[31m\u001b[1m_______________________ .hw3.test_CrossEntropyLoss_local _______________________\u001b[0m\n\n    def test_CrossEntropyLoss_local():\n>       test_CrossEntropyLoss(CrossEntropyLoss)\n\n\u001b[1m\u001b[31mmarimo://hw3.py#cell_id=cell\u001b[0m:2: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nCrossEntropyLoss = <class '__main__.CrossEntropyLoss'>\n\n    def test_CrossEntropyLoss(CrossEntropyLoss):\n        torch.manual_seed(1)\n        logits = torch.randn(100, 50)\n        y = torch.randint(0, 50, (100,))\n        ref = nn.CrossEntropyLoss()(logits, y)\n        mine = CrossEntropyLoss()(logits, y)\n>       assert(mine.ndim == 0)\n               ^^^^^^^^^\n\u001b[1m\u001b[31mE       AttributeError: 'NoneType' object has no attribute 'ndim'\u001b[0m\n\n\u001b[1m\u001b[31mhw3_tests.py\u001b[0m:55: AttributeError\n=================================== Overview ===================================\n\nSummary:\nTotal: 1, Passed: 0, Failed: 1, Errors: 0, Skipped: 0\n\u001b[36m\u001b[1m=========================== short test summary info ============================\u001b[0m\n\u001b[31mFAILED\u001b[0m .::\u001b[1mtest_CrossEntropyLoss_local\u001b[0m - AttributeError: 'NoneType' object has no attribute 'ndim'\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "emfo",
+      "code_hash": "d7e17c0401fc1aef1c2ca73eadf346d7",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='emfo-0' random-id='bd9d6617-714a-d884-8b30-43a2af9d49c5'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;CrossEntropyLoss&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Hstk",
+      "code_hash": "bb9258b0e4efcd9a522e2618553308e4",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "iLit",
+      "code_hash": "66940365957c916dd15a06060441a02d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ZHCJ",
+      "code_hash": "729fa328d7f2171229ad602520667131",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "\u001b[31mF\u001b[0m\u001b[31m                                                                        [100%]\u001b[0m\n=================================== FAILURES ===================================\n\u001b[31m\u001b[1m_____________________________ .hw3.test_SGD_local ______________________________\u001b[0m\n\n    def test_SGD_local():\n>       test_SGD(SGD)\n\n\u001b[1m\u001b[31mmarimo://hw3.py#cell_id=cell\u001b[0m:2: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nSGD = <class '__main__.SGD'>\n\n    def test_SGD(SGD):\n        torch.manual_seed(2)\n        model = nn.Sequential(nn.Linear(6, 4, bias=False), nn.ReLU(), nn.Linear(4, 3, bias=False))\n        ref_model = copy.deepcopy(model)\n    \n        opt = SGD(model.parameters(), learning_rate=0.05)\n        ref_opt = optim.SGD(ref_model.parameters(), lr=0.05)\n        loss_fn = nn.CrossEntropyLoss()\n    \n        X = torch.randn(12, 6)\n        y = torch.randint(0, 3, (12,))\n    \n        for _ in range(3):\n            opt.zero_grad()\n            ref_opt.zero_grad()\n    \n            loss = loss_fn(model(X), y)\n            ref_loss = loss_fn(ref_model(X), y)\n    \n            loss.backward()\n            ref_loss.backward()\n    \n            opt.step()\n            ref_opt.step()\n    \n        for p, p_ref in zip(model.parameters(), ref_model.parameters()):\n>           assert(torch.allclose(p, p_ref, atol=1e-6))\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\u001b[1m\u001b[31mE           AssertionError\u001b[0m\n\n\u001b[1m\u001b[31mhw3_tests.py\u001b[0m:105: AssertionError\n=================================== Overview ===================================\n\nSummary:\nTotal: 1, Passed: 0, Failed: 1, Errors: 0, Skipped: 0\n\u001b[36m\u001b[1m=========================== short test summary info ============================\u001b[0m\n\u001b[31mFAILED\u001b[0m .::\u001b[1mtest_SGD_local\u001b[0m - AssertionError\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "ROlb",
+      "code_hash": "f72355f4ece2273aaf7ba8d8f7f77570",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='ROlb-0' random-id='89eda723-2448-7f18-512c-81f1b6d99ef0'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;SGD&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "qnkX",
+      "code_hash": "4a3816ba239a61d5906c4dfe386f2f78",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Vxnm",
+      "code_hash": "2646d6c2237ce7bacbd8f4842092cf4b",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "DnEU",
+      "code_hash": "11f485f53d7ef91c99fef01d70597cef",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "\u001b[31mF\u001b[0m\u001b[31m                                                                        [100%]\u001b[0m\n=================================== FAILURES ===================================\n\u001b[31m\u001b[1m__________________________ .hw3.test_DataLoader_local __________________________\u001b[0m\n\n    def test_DataLoader_local():\n>       test_DataLoader(DataLoader)\n\n\u001b[1m\u001b[31mmarimo://hw3.py#cell_id=cell\u001b[0m:2: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nDataLoader = <class '__main__.DataLoader'>\n\n    def test_DataLoader(DataLoader):\n        X = torch.arange(24, dtype=torch.float32).reshape(12, 2)\n        y = torch.arange(12)\n        loader = DataLoader(X, y, batch_size=5)\n    \n>       assert(iter(loader) is loader)\n               ^^^^^^^^^^^^\n\u001b[1m\u001b[31mE       TypeError: iter() returned non-iterator of type 'NoneType'\u001b[0m\n\n\u001b[1m\u001b[31mhw3_tests.py\u001b[0m:137: TypeError\n=================================== Overview ===================================\n\nSummary:\nTotal: 1, Passed: 0, Failed: 1, Errors: 0, Skipped: 0\n\u001b[36m\u001b[1m=========================== short test summary info ============================\u001b[0m\n\u001b[31mFAILED\u001b[0m .::\u001b[1mtest_DataLoader_local\u001b[0m - TypeError: iter() returned non-iterator of type 'NoneType'\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "ulZA",
+      "code_hash": "76fc70fa4244eba05cd3c5283bb92115",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='ulZA-0' random-id='ce3e94af-6814-422f-c98b-45bab1e8084c'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;DataLoader&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ecfG",
+      "code_hash": "931799a301e4bd267e466bb75856a11d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ZBYS",
+      "code_hash": "7e4cb13c15641d3c04faa8e6a70d207d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "aLJB",
+      "code_hash": "a7d02fd89aff2d8d1258e93c4d4b00e1",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "\u001b[31mF\u001b[0m\u001b[31m                                                                        [100%]\u001b[0m\n=================================== FAILURES ===================================\n\u001b[31m\u001b[1m____________________________ .hw3.test_epoch_local _____________________________\u001b[0m\n\n    def test_epoch_local():\n>       test_epoch(epoch)\n\n\u001b[1m\u001b[31mmarimo://hw3.py#cell_id=cell\u001b[0m:2: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nepoch = <function epoch at 0x118bb5a60>\n\n    def test_epoch(epoch):\n        torch.manual_seed(3)\n        X = torch.randn(11, 4)\n        y = torch.randint(0, 3, (11,))\n        loss_fn = nn.CrossEntropyLoss()\n    \n        model = nn.Linear(4, 3, bias=False)\n        params_before = [p.detach().clone() for p in model.parameters()]\n        loader = list(zip(X.split(4), y.split(4)))\n    \n>       eval_loss, eval_err = epoch(model, loader, loss_fn)\n        ^^^^^^^^^^^^^^^^^^^\n\u001b[1m\u001b[31mE       TypeError: cannot unpack non-iterable NoneType object\u001b[0m\n\n\u001b[1m\u001b[31mhw3_tests.py\u001b[0m:177: TypeError\n=================================== Overview ===================================\n\nSummary:\nTotal: 1, Passed: 0, Failed: 1, Errors: 0, Skipped: 0\n\u001b[36m\u001b[1m=========================== short test summary info ============================\u001b[0m\n\u001b[31mFAILED\u001b[0m .::\u001b[1mtest_epoch_local\u001b[0m - TypeError: cannot unpack non-iterable NoneType object\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "nHfw",
+      "code_hash": "1bee9a371ccac1996513bb78c57b6efb",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='nHfw-0' random-id='2173802b-2b5f-9539-c1cb-207ca599dde2'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;epoch&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "xXTn",
+      "code_hash": "bdfe93097a953d1812a0f8accb80789c",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "pHFh",
+      "code_hash": "cc3ceca84d1a672aece48da8d9d1d880",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "NCOB",
+      "code_hash": "4fdcde46df66fc08311de897cb9bece8",
+      "outputs": [
+        {
+          "type": "error",
+          "ename": "exception",
+          "evalue": "cannot unpack non-iterable NoneType object",
+          "traceback": []
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stderr",
+          "text": "<span class=\"codehilite\"><div class=\"highlight\"><pre><span></span><span class=\"gt\">Traceback (most recent call last):</span>\n  File <span class=\"nb\">&quot;/var/folders/w2/5g3ht4h93vqb3l6zf_5hv6w40000gp/T/marimo_39006/__marimo__cell_NCOB_.py&quot;</span>, line <span class=\"m\">6</span>, in <span class=\"n\">&lt;module&gt;</span>\n<span class=\"w\">    </span><span class=\"n\">_train_loss</span><span class=\"p\">,</span> <span class=\"n\">_train_err</span> <span class=\"o\">=</span> <span class=\"n\">epoch</span><span class=\"p\">(</span>\n<span class=\"w\">    </span><span class=\"pm\">^^^^^^^^^^^^^^^^^^^^^^^</span>\n<span class=\"gr\">TypeError</span>: <span class=\"n\">cannot unpack non-iterable NoneType object</span>\n</pre></div>\n</span>",
+          "mimetype": "application/vnd.marimo+traceback"
+        }
+      ]
+    },
+    {
+      "id": "aqbW",
+      "code_hash": "3b143dd286db67ef52c0b60e04bcf5e7",
+      "outputs": [
+        {
+          "type": "error",
+          "ename": "exception",
+          "evalue": "An ancestor raised an exception (TypeError): ",
+          "traceback": []
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "TRpd",
+      "code_hash": "e52d29e3b9f660152b4e283e0b748867",
+      "outputs": [
+        {
+          "type": "error",
+          "ename": "exception",
+          "evalue": "An ancestor raised an exception (TypeError): ",
+          "traceback": []
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "TXez",
+      "code_hash": "76cea029eebf8db79128ada512b76487",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='TXez-0' random-id='393a0eae-8d32-6443-26d1-4dbb96ca68c7'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;eval_linear_model&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "dNNg",
+      "code_hash": "3159c12c2dbf035ac3c32ddeaf4a3f1a",
+      "outputs": [
+        {
+          "type": "error",
+          "ename": "exception",
+          "evalue": "An ancestor raised an exception (TypeError): ",
+          "traceback": []
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "kqZH",
+      "code_hash": "70a72e5a7eeaf092b7ed0c7a6b25f4a6",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "wAgl",
+      "code_hash": "ef65efa8a93f6ce1c6cbe88d13706cf5",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "\u001b[31mF\u001b[0m\u001b[31m                                                                        [100%]\u001b[0m\n=================================== FAILURES ===================================\n\u001b[31m\u001b[1m__________________________ .hw3.test_TwoLayerNN_local __________________________\u001b[0m\n\n    def test_TwoLayerNN_local():\n>       test_TwoLayerNN(TwoLayerNN)\n\n\u001b[1m\u001b[31mmarimo://hw3.py#cell_id=cell\u001b[0m:2: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nTwoLayerNN = <class '__main__.TwoLayerNN'>\n\n    def test_TwoLayerNN(TwoLayerNN):\n        torch.manual_seed(4)\n        model = TwoLayerNN(8, 16, 5)\n>       assert(hasattr(model, \"linear1\"))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^\n\u001b[1m\u001b[31mE       AssertionError\u001b[0m\n\n\u001b[1m\u001b[31mhw3_tests.py\u001b[0m:276: AssertionError\n=================================== Overview ===================================\n\nSummary:\nTotal: 1, Passed: 0, Failed: 1, Errors: 0, Skipped: 0\n\u001b[36m\u001b[1m=========================== short test summary info ============================\u001b[0m\n\u001b[31mFAILED\u001b[0m .::\u001b[1mtest_TwoLayerNN_local\u001b[0m - AssertionError\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "rEll",
+      "code_hash": "ec672ad8550bb2a5e63d1466bab91c1a",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='rEll-0' random-id='25f527cb-6054-0bf2-cc6e-91133247aa43'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;TwoLayerNN&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "dGlV",
+      "code_hash": "7c43434453611ecac15bcab8dc985560",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lgWD",
+      "code_hash": "d153bc4d76f5853187a10f2dfe685529",
+      "outputs": [
+        {
+          "type": "error",
+          "ename": "exception",
+          "evalue": "cannot unpack non-iterable NoneType object",
+          "traceback": []
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stderr",
+          "text": "<span class=\"codehilite\"><div class=\"highlight\"><pre><span></span><span class=\"gt\">Traceback (most recent call last):</span>\n  File <span class=\"nb\">&quot;/var/folders/w2/5g3ht4h93vqb3l6zf_5hv6w40000gp/T/marimo_39006/__marimo__cell_lgWD_.py&quot;</span>, line <span class=\"m\">6</span>, in <span class=\"n\">&lt;module&gt;</span>\n<span class=\"w\">    </span><span class=\"n\">_train_loss</span><span class=\"p\">,</span> <span class=\"n\">_train_err</span> <span class=\"o\">=</span> <span class=\"n\">epoch</span><span class=\"p\">(</span>\n<span class=\"w\">    </span><span class=\"pm\">^^^^^^^^^^^^^^^^^^^^^^^</span>\n<span class=\"gr\">TypeError</span>: <span class=\"n\">cannot unpack non-iterable NoneType object</span>\n</pre></div>\n</span>",
+          "mimetype": "application/vnd.marimo+traceback"
+        }
+      ]
+    },
+    {
+      "id": "yOPj",
+      "code_hash": "d9af72cdec2ba22c73d286d9b311d890",
+      "outputs": [
+        {
+          "type": "error",
+          "ename": "exception",
+          "evalue": "An ancestor raised an exception (TypeError): ",
+          "traceback": []
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "fwwy",
+      "code_hash": "2f7a164a9f0e2026a288ed16f5b3d5cb",
+      "outputs": [
+        {
+          "type": "error",
+          "ename": "exception",
+          "evalue": "An ancestor raised an exception (TypeError): ",
+          "traceback": []
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "LJZf",
+      "code_hash": "f3999fc7db99a6995a4f557aa0f17a95",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='LJZf-0' random-id='feb20387-72ad-d2e5-5e1a-a4d900d2bd32'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;eval_two_layer_nn&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "urSm",
+      "code_hash": "f7076cf07314e6f0f1df0e86d417b262",
+      "outputs": [
+        {
+          "type": "error",
+          "ename": "exception",
+          "evalue": "An ancestor raised an exception (TypeError): ",
+          "traceback": []
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "mWxS",
+      "code_hash": "51668a29483c2132b105294cc9496591",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "CcZR",
+      "code_hash": "eaf3952004ad210aa567dd4612d9f6aa",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "\u001b[31mF\u001b[0m\u001b[31m                                                                        [100%]\u001b[0m\n=================================== FAILURES ===================================\n\u001b[31m\u001b[1m_________________________ .hw3.test_MultiLayerNN_local _________________________\u001b[0m\n\n    def test_MultiLayerNN_local():\n>       test_MultiLayerNN(MultiLayerNN)\n\n\u001b[1m\u001b[31mmarimo://hw3.py#cell_id=cell\u001b[0m:2: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nMultiLayerNN = <class '__main__.MultiLayerNN'>\n\n    def test_MultiLayerNN(MultiLayerNN):\n        torch.manual_seed(5)\n        hidden_dims = [7, 5, 4]\n        model = MultiLayerNN(6, 3, hidden_dims)\n    \n>       assert(hasattr(model, \"linears\"))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^\n\u001b[1m\u001b[31mE       AssertionError\u001b[0m\n\n\u001b[1m\u001b[31mhw3_tests.py\u001b[0m:340: AssertionError\n=================================== Overview ===================================\n\nSummary:\nTotal: 1, Passed: 0, Failed: 1, Errors: 0, Skipped: 0\n\u001b[36m\u001b[1m=========================== short test summary info ============================\u001b[0m\n\u001b[31mFAILED\u001b[0m .::\u001b[1mtest_MultiLayerNN_local\u001b[0m - AssertionError\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "YWSi",
+      "code_hash": "3e4a8a2238f3d1dbae3ceb4ddfd4debd",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='YWSi-0' random-id='84f1e24d-f899-0af7-05f5-b36f130383c4'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;MultiLayerNN&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "zlud",
+      "code_hash": "5739a8a75c646a6552e0700ab93bbe87",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    }
+  ]
+}
