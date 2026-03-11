@@ -1,0 +1,964 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.20.4",
+    "script_metadata_hash": "5a62f40d87b16e18b5607ef40152da02"
+  },
+  "cells": [
+    {
+      "id": "Hbol",
+      "code_hash": "d944294d7730462aed46cb917987c20c",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"homework-4-transformers\">Homework 4 - Transformers</h2>\n<span class=\"paragraph\">In this homework, you will build the components of a Transformer-based LLM, load the weights of a Llama 3.2 1B model, and use it to perform inference. You should only import <code>Module</code>, <code>ModuleList</code>, <code>Parameter</code>, and <code>Buffer</code> from <code>torch.nn</code> (no other <code>torch.nn</code> modules are allowed).</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "66aa7cf0a3d0a3f4dc872dcb3b78f892",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"question-1-linear-layer\">Question 1 - Linear Layer</h3>\n<span class=\"paragraph\">Implement a <code>Linear</code> layer, similar to the one from Homework 3, but using <code>torch.empty()</code> instead of <code>torch.randn()</code> to initialize the weight. The weight should be stored as a <code>Parameter</code> of shape <code>(out_dim, in_dim)</code> called <code>.weight</code>. The forward pass computes <marimo-tex class=\"arithmatex\">||(XW^T||)</marimo-tex>.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SFPL",
+      "code_hash": "436e6c0b46ff071d110f8292bcf263b0",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"question-2-embedding-layer\">Question 2 - Embedding Layer</h3>\n<span class=\"paragraph\">Implement an <code>Embedding</code> layer that converts token indices to dense vectors. The layer stores a <code>.weight</code> Parameter of shape <code>(num_tokens, dim)</code>, initialized with <code>torch.empty()</code>. The forward pass indexes into the weight matrix to retrieve embeddings for the given token indices.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Hstk",
+      "code_hash": "d737d79afcd30e7da466645c9c7c9e8a",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"question-3-silu-nonlinearity\">Question 3 - SiLU Nonlinearity</h3>\n<span class=\"paragraph\">Implement the SiLU (Sigmoid Linear Unit) activation function, defined as:</span>\n<marimo-tex class=\"arithmatex\">||[\\text{silu}(x) = x \\cdot \\sigma(x) = x \\cdot \\frac{1}{1 + e^{-x}}||]</marimo-tex></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "qnkX",
+      "code_hash": "70fbef0c7999a5ecc5e7feaec8870c8e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"question-4-rms-norm\">Question 4 - RMS Norm</h3>\n<span class=\"paragraph\">Implement RMS (Root Mean Square) Normalization. Given an input <marimo-tex class=\"arithmatex\">||(X \\in \\mathbb{R}^{n \\times d}||)</marimo-tex> and a learnable weight <marimo-tex class=\"arithmatex\">||(w \\in \\mathbb{R}^d||)</marimo-tex>, RMSNorm is defined as:</span>\n<marimo-tex class=\"arithmatex\">||[\\text{RMSNorm}(X) = \\frac{X}{\\sqrt{\\frac{1}{d}\\sum_{j=1}^{d} X_{j}^2 + \\epsilon}} \\odot w||]</marimo-tex><span class=\"paragraph\">The <code>.weight</code> parameter should be initialized to ones.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ecfG",
+      "code_hash": "892aae04467b97f37439bfe513080be6",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"question-5-masked-self-attention\">Question 5 - Masked Self Attention</h3>\n<span class=\"paragraph\">Implement scaled dot-product self attention. Given queries <marimo-tex class=\"arithmatex\">||(Q||)</marimo-tex>, keys <marimo-tex class=\"arithmatex\">||(K||)</marimo-tex>, and values <marimo-tex class=\"arithmatex\">||(V||)</marimo-tex>, and an optional mask, self attention is computed as:</span>\n<marimo-tex class=\"arithmatex\">||[\\text{self\\_attention}(Q, K, V, \\text{mask}) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d}} + \\text{mask}\\right) V||]</marimo-tex><span class=\"paragraph\">where <marimo-tex class=\"arithmatex\">||(d||)</marimo-tex> is the dimension of the queries/keys (the last dimension of <marimo-tex class=\"arithmatex\">||(Q||)</marimo-tex>). If <code>mask</code> is <code>None</code>, the attention is computed without masking.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "xXTn",
+      "code_hash": "1c28e4e9b4029e37498a762db5ee670d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"question-6-multi-head-attention-no-caching\">Question 6 - Multi-head Attention (no caching)</h3>\n<span class=\"paragraph\">Implement multi-head attention with the following steps:</span>\n<ol>\n<li>Form <marimo-tex class=\"arithmatex\">||(Q = XW_q^T||)</marimo-tex>, <marimo-tex class=\"arithmatex\">||(K = XW_k^T||)</marimo-tex>, <marimo-tex class=\"arithmatex\">||(V = XW_v^T||)</marimo-tex> using Linear layers <code>wq</code>, <code>wk</code>, <code>wv</code>.</li>\n<li>Split the <marimo-tex class=\"arithmatex\">||(d||)</marimo-tex>-dimensional vectors into <code>n_heads</code> heads, each of dimension <marimo-tex class=\"arithmatex\">||(d / n\\_heads||)</marimo-tex>. Reshape from <code>(batch, seq, dim)</code> to <code>(batch, n_heads, seq, head_dim)</code>.</li>\n<li>Apply <code>self_attention</code> to each head (with optional mask).</li>\n<li>Concatenate the heads back and project with <code>wp</code>: <marimo-tex class=\"arithmatex\">||(\\text{output} = \\text{concat}(heads) W_p^T||)</marimo-tex>.</li>\n</ol>\n<span class=\"paragraph\">For this first version, ignore the <code>seq_pos</code> and <code>use_kv_cache</code> arguments.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "TRpd",
+      "code_hash": "6bbb3a6ec9eccb97c562c5acb74af6f3",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"question-6-cont-multi-head-attention-with-kv-cache\">Question 6 (cont.) - Multi-head Attention with KV Cache</h3>\n<span class=\"paragraph\">Now implement multi-head attention with KV caching. The KV cache stores previously computed keys and values so that during autoregressive generation, we only need to compute Q, K, V for the new tokens, then concatenate K and V with the cached values.</span>\n<span class=\"paragraph\">The class should have <code>k_cache</code> and <code>v_cache</code> Buffers of shape <code>(1, max_cache_size, dim)</code>, initialized to zeros.</span>\n<span class=\"paragraph\">When <code>use_kv_cache=True</code>:</span>\n<ul>\n<li>Compute K, V only for the new tokens.</li>\n<li>Store them in the cache at positions <code>seq_pos : seq_pos + seq_len</code>.</li>\n<li>Use the full cached K, V (up to <code>seq_pos + seq_len</code>) for attention.</li>\n</ul>\n<span class=\"paragraph\">When <code>use_kv_cache=False</code>:</span>\n<ul>\n<li>Behave exactly like the non-caching version.</li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "kqZH",
+      "code_hash": "aa069dd47babff03a9334864afd88860",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"question-7-gated-mlp\">Question 7 - Gated MLP</h3>\n<span class=\"paragraph\">Implement the Gated MLP (as used in Llama), defined as:</span>\n<marimo-tex class=\"arithmatex\">||[\\text{GatedMLP}(X) = (\\text{silu}(XW_1^T) \\odot XW_3^T) W_2^T||]</marimo-tex><span class=\"paragraph\">where <marimo-tex class=\"arithmatex\">||(W_1, W_3 \\in \\mathbb{R}^{d_{ffn} \\times d}||)</marimo-tex> and <marimo-tex class=\"arithmatex\">||(W_2 \\in \\mathbb{R}^{d \\times d_{ffn}}||)</marimo-tex> are Linear layers <code>w1</code>, <code>w2</code>, <code>w3</code>, and <marimo-tex class=\"arithmatex\">||(\\odot||)</marimo-tex> denotes element-wise multiplication.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lgWD",
+      "code_hash": "971ffd3d3a09262bad7ca38d569ee0dc",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"question-8-transformer-block\">Question 8 - Transformer Block</h3>\n<span class=\"paragraph\">Implement a single Transformer block with pre-norm residual connections:</span>\n<marimo-tex class=\"arithmatex\">||[Z = X + \\text{MultiHeadAttentionKVCache}(\\text{RMSNorm}_1(X))||]</marimo-tex><marimo-tex class=\"arithmatex\">||[Y = Z + \\text{GatedMLP}(\\text{RMSNorm}_2(Z))||]</marimo-tex><span class=\"paragraph\">The block should contain: <code>attn</code> (MultiHeadAttentionKVCache), <code>norm1</code> and <code>norm2</code> (RMSNorm), and <code>mlp</code> (GatedMLP).</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "jxvo",
+      "code_hash": "48f2177162bbf0cccd80d41429b75fb6",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"question-9-llama3-model\">Question 9 - Llama3 Model</h3>\n<span class=\"paragraph\">Implement the full Llama 3 simplified model. The model consists of:</span>\n<ul>\n<li><code>embedding</code>: an <code>Embedding</code> layer mapping token indices to vectors of dimension <code>dim</code>.</li>\n<li><code>pos_embeddings</code>: a <code>Buffer</code> of shape <code>(max_seq_len, dim)</code> for positional embeddings (initialized with <code>torch.empty()</code>).</li>\n<li><code>layers</code>: a <code>ModuleList</code> of <code>num_layers</code> <code>TransformerBlock</code> layers.</li>\n<li><code>norm</code>: a final <code>RMSNorm</code> layer.</li>\n<li><code>output</code>: a <code>Linear</code> layer mapping from <code>dim</code> to <code>num_tokens</code>.</li>\n<li><code>mask</code>: a <code>Buffer</code> containing a causal mask of shape <code>(max_seq_len, max_seq_len)</code>, i.e., an upper-triangular matrix of <code>-inf</code> values (use <code>torch.triu</code> with <code>diagonal=1</code>).</li>\n</ul>\n<span class=\"paragraph\">The forward pass:</span>\n<ol>\n<li>Look up token embeddings and add positional embeddings for positions <code>seq_pos</code> through <code>seq_pos + seq_len</code>.</li>\n<li>Pass through each Transformer block (with appropriate mask and caching arguments).</li>\n<li>Apply final RMSNorm.</li>\n<li>Apply the output Linear layer.</li>\n</ol>\n<span class=\"paragraph\">The <code>load_llama_weights</code> method is provided for you to load pretrained weights.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "tZnO",
+      "code_hash": "ea833c79180d39f1fc37432e5c994f31",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">If you implemented the above correctly, you should be able to download the model configuration and weights from HuggingFace, load them into your model, and run inference.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "EJmg",
+      "code_hash": "8e8cb881ff174bf5f0577a82a6b3aa8e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"question-10-generation\">Question 10 - Generation</h3>\n<span class=\"paragraph\">Implement autoregressive text generation with KV caching. Given a model, a list of prompt tokens, and a tokenizer:</span>\n<ol>\n<li>Run the model on the full prompt (as a batch of size 1) with <code>seq_pos=0</code> and <code>use_kv_cache=True</code>.</li>\n<li>Sample the next token from the logits of the last position using temperature-scaled sampling: divide logits by <code>temp</code>, apply softmax, and sample from the resulting distribution using <code>torch.multinomial</code>.</li>\n<li>If the sampled token is a stop token (<code>tokenizer.stop_tokens</code>), stop generating.</li>\n<li>Otherwise, if <code>verbose=True</code>, print the decoded token (using <code>tokenizer.decode</code>) with <code>end=\"\\\"</code> and <code>flush=True</code>.</li>\n<li>Feed the sampled token back into the model (as a single-token sequence) with the appropriate <code>seq_pos</code> and <code>use_kv_cache=True</code>.</li>\n<li>Repeat until a stop token is generated or <code>max_tokens</code> new tokens have been generated.</li>\n<li>Return the list of all generated tokens (not including the prompt, but including the stop token if one was generated).</li>\n</ol></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "dxZZ",
+      "code_hash": "ee8262715c22c1f4d74aff75cee0cba4",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">If you have implemented this all correctly, the following code should generate a response from the Llama 3.2 1B model.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "setup",
+      "code_hash": "bb39076b8809d1486534c277b30a4d0a",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stderr",
+          "text": "File \u2018hw4_tests.py\u2019 already there; not retrieving.\n\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "639c6e138116da9c078815dbc3926dd6",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "f717ad634c7d73dabcebfe5aee11c6b7",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "5598f57028b46d5561ec1b4e26a41f36",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "\u001b[31mF\u001b[0m\u001b[31m                                                                        [100%]\u001b[0m\n=================================== FAILURES ===================================\n\u001b[31m\u001b[1m____________________________ .hw4.test_Linear_local ____________________________\u001b[0m\n\n    def test_Linear_local():\n>       test_Linear(Linear)\n\n\u001b[1m\u001b[31mmarimo://hw4.py#cell_id=cell\u001b[0m:2: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nLinear = <class '__main__.Linear'>\n\n    def test_Linear(Linear):\n        torch.manual_seed(0)\n        layer = Linear(10, 20)\n>       assert(hasattr(layer, \"weight\"))\n               ^^^^^^^^^^^^^^^^^^^^^^^^\n\u001b[1m\u001b[31mE       AssertionError\u001b[0m\n\n\u001b[1m\u001b[31mhw4_tests.py\u001b[0m:68: AssertionError\n=================================== Overview ===================================\n\nSummary:\nTotal: 1, Passed: 0, Failed: 1, Errors: 0, Skipped: 0\n\u001b[36m\u001b[1m=========================== short test summary info ============================\u001b[0m\n\u001b[31mFAILED\u001b[0m .::\u001b[1mtest_Linear_local\u001b[0m - AssertionError\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "PKri",
+      "code_hash": "36e81fc2119b21757d804198badea0ad",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='PKri-0' random-id='1d8d802d-12b9-98bd-cefc-b1fcfd116b44'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;Linear&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Xref",
+      "code_hash": "36ce8cc68d46877cceb8722681f63e27",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "BYtC",
+      "code_hash": "ff59aec0988821b4901c3964616e96c7",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "RGSE",
+      "code_hash": "87201aa26ba2c3435966ae8419b71a9d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "\u001b[31mF\u001b[0m\u001b[31m                                                                        [100%]\u001b[0m\n=================================== FAILURES ===================================\n\u001b[31m\u001b[1m__________________________ .hw4.test_Embedding_local ___________________________\u001b[0m\n\n    def test_Embedding_local():\n>       test_Embedding(Embedding)\n\n\u001b[1m\u001b[31mmarimo://hw4.py#cell_id=cell\u001b[0m:2: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nEmbedding = <class '__main__.Embedding'>\n\n    def test_Embedding(Embedding):\n        torch.manual_seed(1)\n        layer = Embedding(200, 20)\n>       assert(hasattr(layer, \"weight\"))\n               ^^^^^^^^^^^^^^^^^^^^^^^^\n\u001b[1m\u001b[31mE       AssertionError\u001b[0m\n\n\u001b[1m\u001b[31mhw4_tests.py\u001b[0m:103: AssertionError\n=================================== Overview ===================================\n\nSummary:\nTotal: 1, Passed: 0, Failed: 1, Errors: 0, Skipped: 0\n\u001b[36m\u001b[1m=========================== short test summary info ============================\u001b[0m\n\u001b[31mFAILED\u001b[0m .::\u001b[1mtest_Embedding_local\u001b[0m - AssertionError\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "Kclp",
+      "code_hash": "900e7793ca2cc7d99d8c41d0e0925922",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='Kclp-0' random-id='5737852f-db00-cdca-021c-4ce403271cb9'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;Embedding&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "emfo",
+      "code_hash": "8b7af3f623181be503c9576d20b15dbd",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "nWHF",
+      "code_hash": "e752cbdc56c85c8e5a1f21bd4851411a",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "iLit",
+      "code_hash": "d5b09a877d2a3ecf4e8c3b8e66ee8036",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "\u001b[31mF\u001b[0m\u001b[31m                                                                        [100%]\u001b[0m\n=================================== FAILURES ===================================\n\u001b[31m\u001b[1m_____________________________ .hw4.test_silu_local _____________________________\u001b[0m\n\n    def test_silu_local():\n>       test_silu(silu)\n\n\u001b[1m\u001b[31mmarimo://hw4.py#cell_id=cell\u001b[0m:2: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nsilu = <function silu at 0x112efa2a0>\n\n    def test_silu(silu):\n        torch.manual_seed(2)\n        X = torch.randn(10, 20)\n>       assert(torch.allclose(silu(X), F.silu(X), atol=1e-6))\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\u001b[1m\u001b[31mE       TypeError: allclose(): argument 'input' (position 1) must be Tensor, not NoneType\u001b[0m\n\n\u001b[1m\u001b[31mhw4_tests.py\u001b[0m:141: TypeError\n=================================== Overview ===================================\n\nSummary:\nTotal: 1, Passed: 0, Failed: 1, Errors: 0, Skipped: 0\n\u001b[36m\u001b[1m=========================== short test summary info ============================\u001b[0m\n\u001b[31mFAILED\u001b[0m .::\u001b[1mtest_silu_local\u001b[0m - TypeError: allclose(): argument 'input' (position 1) must be Tensor, not No...\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "ZHCJ",
+      "code_hash": "12bbffc4ad774ac8b25ef8a2baf8941a",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='ZHCJ-0' random-id='e7810742-ffef-db3c-59df-1b8222b23a8b'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;silu&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ROlb",
+      "code_hash": "8856eec796226f9c7cc3fecfe0992783",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "TqIu",
+      "code_hash": "defd5ec1b1a59428d2167f2d3a321561",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Vxnm",
+      "code_hash": "5ec58ff2f0f6458e729ca76126e94b7a",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "\u001b[31mF\u001b[0m\u001b[31m                                                                        [100%]\u001b[0m\n=================================== FAILURES ===================================\n\u001b[31m\u001b[1m___________________________ .hw4.test_RMSNorm_local ____________________________\u001b[0m\n\n    def test_RMSNorm_local():\n>       test_RMSNorm(RMSNorm)\n\n\u001b[1m\u001b[31mmarimo://hw4.py#cell_id=cell\u001b[0m:2: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nRMSNorm = <class '__main__.RMSNorm'>\n\n    def test_RMSNorm(RMSNorm):\n        torch.manual_seed(3)\n        layer = RMSNorm(20, eps=1e-3)\n>       assert(hasattr(layer, \"weight\"))\n               ^^^^^^^^^^^^^^^^^^^^^^^^\n\u001b[1m\u001b[31mE       AssertionError\u001b[0m\n\n\u001b[1m\u001b[31mhw4_tests.py\u001b[0m:157: AssertionError\n=================================== Overview ===================================\n\nSummary:\nTotal: 1, Passed: 0, Failed: 1, Errors: 0, Skipped: 0\n\u001b[36m\u001b[1m=========================== short test summary info ============================\u001b[0m\n\u001b[31mFAILED\u001b[0m .::\u001b[1mtest_RMSNorm_local\u001b[0m - AssertionError\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "DnEU",
+      "code_hash": "04411917b44a5526ffe65349185d416f",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='DnEU-0' random-id='c7855b31-6262-d99b-ea27-3091b9525292'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;RMSNorm&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ulZA",
+      "code_hash": "e88416a502e829849c18c9f24e4bd2d7",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Pvdt",
+      "code_hash": "0e639a119c832fbb0553defac0868a69",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ZBYS",
+      "code_hash": "dfd602f4385b59b8b77c95a321ab5e70",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "\u001b[31mF\u001b[0m\u001b[31m                                                                        [100%]\u001b[0m\n=================================== FAILURES ===================================\n\u001b[31m\u001b[1m________________________ .hw4.test_self_attention_local ________________________\u001b[0m\n\n    def test_self_attention_local():\n>       test_self_attention(self_attention)\n\n\u001b[1m\u001b[31mmarimo://hw4.py#cell_id=cell\u001b[0m:2: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nself_attention = <function self_attention at 0x112055170>\n\n    def test_self_attention(self_attention):\n        torch.manual_seed(4)\n        Q = torch.randn(5, 8)\n        K = torch.randn(5, 8)\n        V = torch.randn(5, 6)\n        mask = _causal_mask(5)\n    \n        ref = F.scaled_dot_product_attention(Q.unsqueeze(0).unsqueeze(0),\n                                             K.unsqueeze(0).unsqueeze(0),\n                                             V.unsqueeze(0).unsqueeze(0),\n                                             attn_mask=mask,\n                                             dropout_p=0.0)[0, 0]\n        out = self_attention(Q, K, V, mask)\n>       assert(out.shape == (5, 6))\n               ^^^^^^^^^\n\u001b[1m\u001b[31mE       AttributeError: 'NoneType' object has no attribute 'shape'\u001b[0m\n\n\u001b[1m\u001b[31mhw4_tests.py\u001b[0m:199: AttributeError\n=================================== Overview ===================================\n\nSummary:\nTotal: 1, Passed: 0, Failed: 1, Errors: 0, Skipped: 0\n\u001b[36m\u001b[1m=========================== short test summary info ============================\u001b[0m\n\u001b[31mFAILED\u001b[0m .::\u001b[1mtest_self_attention_local\u001b[0m - AttributeError: 'NoneType' object has no attribute 'shape'\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "aLJB",
+      "code_hash": "57fbcc2fb5cd89b5922c6c25d727c143",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='aLJB-0' random-id='a86bf8c6-1452-fd6c-737e-b7baf9052fe4'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;self_attention&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "nHfw",
+      "code_hash": "14c090514fd5adf7079336e0c2e2b2c4",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "AjVT",
+      "code_hash": "bfaa32f28d6c45ad32ff7881f4fb8ba3",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "pHFh",
+      "code_hash": "471019ff7006c0d2ff075c60a87d1186",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "\u001b[31mF\u001b[0m\u001b[31m                                                                        [100%]\u001b[0m\n=================================== FAILURES ===================================\n\u001b[31m\u001b[1m______________________ .hw4.test_MultiHeadAttention_local ______________________\u001b[0m\n\n    def test_MultiHeadAttention_local():\n>       test_MultiHeadAttention(MultiHeadAttention)\n\n\u001b[1m\u001b[31mmarimo://hw4.py#cell_id=cell\u001b[0m:2: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\u001b[1m\u001b[31mhw4_tests.py\u001b[0m:232: in test_MultiHeadAttention\n    attn.wq.weight.copy_(torch.randn_like(attn.wq.weight))\n    ^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nself = MultiHeadAttention(), name = 'wq'\n\n    def __getattr__(self, name: str) -> Union[Tensor, \"Module\"]:\n        if \"_parameters\" in self.__dict__:\n            _parameters = self.__dict__[\"_parameters\"]\n            if name in _parameters:\n                return _parameters[name]\n        if \"_buffers\" in self.__dict__:\n            _buffers = self.__dict__[\"_buffers\"]\n            if name in _buffers:\n                return _buffers[name]\n        if \"_modules\" in self.__dict__:\n            modules = self.__dict__[\"_modules\"]\n            if name in modules:\n                return modules[name]\n>       raise AttributeError(\n            f\"'{type(self).__name__}' object has no attribute '{name}'\"\n        )\n\u001b[1m\u001b[31mE       AttributeError: 'MultiHeadAttention' object has no attribute 'wq'\u001b[0m\n\n\u001b[1m\u001b[31m../../../../../.cache/uv/archive-v0/hl1VE-D0oAPjdhhxp6k7f/lib/python3.14/site-packages/torch/nn/modules/module.py\u001b[0m:1965: AttributeError\n=================================== Overview ===================================\n\nSummary:\nTotal: 1, Passed: 0, Failed: 1, Errors: 0, Skipped: 0\n\u001b[36m\u001b[1m=========================== short test summary info ============================\u001b[0m\n\u001b[31mFAILED\u001b[0m .::\u001b[1mtest_MultiHeadAttention_local\u001b[0m - AttributeError: 'MultiHeadAttention' object has no attribute 'wq'\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "NCOB",
+      "code_hash": "54b4545f29669f72b943b2683655b0e2",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='NCOB-0' random-id='8b30790e-fcdf-db84-8f78-00cc9320352b'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;MultiHeadAttention&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "aqbW",
+      "code_hash": "080c436ae160d785135cb5711714c348",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "TXez",
+      "code_hash": "eb483c06b43ede82cc6be17d3ee1c789",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "dNNg",
+      "code_hash": "b875926dfc44029c76f48c52f39301ee",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "\u001b[31mF\u001b[0m\u001b[31m                                                                        [100%]\u001b[0m\n=================================== FAILURES ===================================\n\u001b[31m\u001b[1m__________________ .hw4.test_MultiHeadAttentionKVCache_local ___________________\u001b[0m\n\n    def test_MultiHeadAttentionKVCache_local():\n>       test_MultiHeadAttentionKVCache(MultiHeadAttentionKVCache)\n\n\u001b[1m\u001b[31mmarimo://hw4.py#cell_id=cell\u001b[0m:2: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\u001b[1m\u001b[31mhw4_tests.py\u001b[0m:284: in test_MultiHeadAttentionKVCache\n    attn.wq.weight.copy_(torch.randn_like(attn.wq.weight))\n    ^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nself = MultiHeadAttentionKVCache(), name = 'wq'\n\n    def __getattr__(self, name: str) -> Union[Tensor, \"Module\"]:\n        if \"_parameters\" in self.__dict__:\n            _parameters = self.__dict__[\"_parameters\"]\n            if name in _parameters:\n                return _parameters[name]\n        if \"_buffers\" in self.__dict__:\n            _buffers = self.__dict__[\"_buffers\"]\n            if name in _buffers:\n                return _buffers[name]\n        if \"_modules\" in self.__dict__:\n            modules = self.__dict__[\"_modules\"]\n            if name in modules:\n                return modules[name]\n>       raise AttributeError(\n            f\"'{type(self).__name__}' object has no attribute '{name}'\"\n        )\n\u001b[1m\u001b[31mE       AttributeError: 'MultiHeadAttentionKVCache' object has no attribute 'wq'\u001b[0m\n\n\u001b[1m\u001b[31m../../../../../.cache/uv/archive-v0/hl1VE-D0oAPjdhhxp6k7f/lib/python3.14/site-packages/torch/nn/modules/module.py\u001b[0m:1965: AttributeError\n=================================== Overview ===================================\n\nSummary:\nTotal: 1, Passed: 0, Failed: 1, Errors: 0, Skipped: 0\n\u001b[36m\u001b[1m=========================== short test summary info ============================\u001b[0m\n\u001b[31mFAILED\u001b[0m .::\u001b[1mtest_MultiHeadAttentionKVCache_local\u001b[0m - AttributeError: 'MultiHeadAttentionKVCache' object has no attribute 'wq'\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "yCnT",
+      "code_hash": "d973c5df4829ffd4adae673be36b3939",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='yCnT-0' random-id='385d0909-3ca5-cd16-4e96-33ab299ec929'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;MultiHeadAttentionKVCache&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "wlCL",
+      "code_hash": "5feeab1b69175e476d73563037e9ade3",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "wAgl",
+      "code_hash": "fa4142aaaa68f0f8d22dbc7ba9a03651",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "rEll",
+      "code_hash": "19a19c0065cc2c790ef531ceb45d4e57",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "\u001b[31mF\u001b[0m\u001b[31m                                                                        [100%]\u001b[0m\n=================================== FAILURES ===================================\n\u001b[31m\u001b[1m___________________________ .hw4.test_GatedMLP_local ___________________________\u001b[0m\n\n    def test_GatedMLP_local():\n>       test_GatedMLP(GatedMLP)\n\n\u001b[1m\u001b[31mmarimo://hw4.py#cell_id=cell\u001b[0m:2: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nGatedMLP = <class '__main__.GatedMLP'>\n\n    def test_GatedMLP(GatedMLP):\n        mlp = GatedMLP(2, 3)\n>       assert(hasattr(mlp, \"w1\"))\n               ^^^^^^^^^^^^^^^^^^\n\u001b[1m\u001b[31mE       AssertionError\u001b[0m\n\n\u001b[1m\u001b[31mhw4_tests.py\u001b[0m:349: AssertionError\n=================================== Overview ===================================\n\nSummary:\nTotal: 1, Passed: 0, Failed: 1, Errors: 0, Skipped: 0\n\u001b[36m\u001b[1m=========================== short test summary info ============================\u001b[0m\n\u001b[31mFAILED\u001b[0m .::\u001b[1mtest_GatedMLP_local\u001b[0m - AssertionError\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "dGlV",
+      "code_hash": "95f6eb3b32512a0bbb7c3c4629b97856",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='dGlV-0' random-id='f2c65088-6ec3-ac76-d899-3017bd1772f7'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;GatedMLP&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SdmI",
+      "code_hash": "7e6e9616008303b81c0192681979e477",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "yOPj",
+      "code_hash": "ee77d50b3bd48bc444a5091734caf73d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "fwwy",
+      "code_hash": "ab1f63c5b115f62d4778bf26fea9d9c6",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "\u001b[31mF\u001b[0m\u001b[31m                                                                        [100%]\u001b[0m\n=================================== FAILURES ===================================\n\u001b[31m\u001b[1m_______________________ .hw4.test_TransformerBlock_local _______________________\u001b[0m\n\n    def test_TransformerBlock_local():\n>       test_TransformerBlock(TransformerBlock)\n\n\u001b[1m\u001b[31mmarimo://hw4.py#cell_id=cell\u001b[0m:2: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\u001b[1m\u001b[31mhw4_tests.py\u001b[0m:402: in test_TransformerBlock\n    block.norm1.weight.fill_(1.0)\n    ^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nself = TransformerBlock(), name = 'norm1'\n\n    def __getattr__(self, name: str) -> Union[Tensor, \"Module\"]:\n        if \"_parameters\" in self.__dict__:\n            _parameters = self.__dict__[\"_parameters\"]\n            if name in _parameters:\n                return _parameters[name]\n        if \"_buffers\" in self.__dict__:\n            _buffers = self.__dict__[\"_buffers\"]\n            if name in _buffers:\n                return _buffers[name]\n        if \"_modules\" in self.__dict__:\n            modules = self.__dict__[\"_modules\"]\n            if name in modules:\n                return modules[name]\n>       raise AttributeError(\n            f\"'{type(self).__name__}' object has no attribute '{name}'\"\n        )\n\u001b[1m\u001b[31mE       AttributeError: 'TransformerBlock' object has no attribute 'norm1'\u001b[0m\n\n\u001b[1m\u001b[31m../../../../../.cache/uv/archive-v0/hl1VE-D0oAPjdhhxp6k7f/lib/python3.14/site-packages/torch/nn/modules/module.py\u001b[0m:1965: AttributeError\n=================================== Overview ===================================\n\nSummary:\nTotal: 1, Passed: 0, Failed: 1, Errors: 0, Skipped: 0\n\u001b[36m\u001b[1m=========================== short test summary info ============================\u001b[0m\n\u001b[31mFAILED\u001b[0m .::\u001b[1mtest_TransformerBlock_local\u001b[0m - AttributeError: 'TransformerBlock' object has no attribute 'norm1'\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "LJZf",
+      "code_hash": "5c3b73a740b1a674d228832797859275",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='LJZf-0' random-id='e689fd10-d99e-60aa-3e48-fc5b0306c6ee'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;TransformerBlock&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "urSm",
+      "code_hash": "b006c6c2cb9633f443020c6c61561a7d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "mWxS",
+      "code_hash": "69dfd05b2794c9fbbba009955f76436d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "CcZR",
+      "code_hash": "06e3dd8883ee69451d50cdf557cd1671",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "\u001b[31mF\u001b[0m\u001b[31m                                                                        [100%]\u001b[0m\n=================================== FAILURES ===================================\n\u001b[31m\u001b[1m_______________________ .hw4.test_Llama3Simplified_local _______________________\u001b[0m\n\n    def test_Llama3Simplified_local():\n>       test_Llama3Simplified(Llama3Simplified)\n\n\u001b[1m\u001b[31mmarimo://hw4.py#cell_id=cell\u001b[0m:2: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\u001b[1m\u001b[31mhw4_tests.py\u001b[0m:483: in test_Llama3Simplified\n    assert(model.embedding.weight.shape == (5, 4))\n           ^^^^^^^^^^^^^^^\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nself = Llama3Simplified(), name = 'embedding'\n\n    def __getattr__(self, name: str) -> Union[Tensor, \"Module\"]:\n        if \"_parameters\" in self.__dict__:\n            _parameters = self.__dict__[\"_parameters\"]\n            if name in _parameters:\n                return _parameters[name]\n        if \"_buffers\" in self.__dict__:\n            _buffers = self.__dict__[\"_buffers\"]\n            if name in _buffers:\n                return _buffers[name]\n        if \"_modules\" in self.__dict__:\n            modules = self.__dict__[\"_modules\"]\n            if name in modules:\n                return modules[name]\n>       raise AttributeError(\n            f\"'{type(self).__name__}' object has no attribute '{name}'\"\n        )\n\u001b[1m\u001b[31mE       AttributeError: 'Llama3Simplified' object has no attribute 'embedding'\u001b[0m\n\n\u001b[1m\u001b[31m../../../../../.cache/uv/archive-v0/hl1VE-D0oAPjdhhxp6k7f/lib/python3.14/site-packages/torch/nn/modules/module.py\u001b[0m:1965: AttributeError\n=================================== Overview ===================================\n\nSummary:\nTotal: 1, Passed: 0, Failed: 1, Errors: 0, Skipped: 0\n\u001b[36m\u001b[1m=========================== short test summary info ============================\u001b[0m\n\u001b[31mFAILED\u001b[0m .::\u001b[1mtest_Llama3Simplified_local\u001b[0m - AttributeError: 'Llama3Simplified' object has no attribute 'embedding'\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "YWSi",
+      "code_hash": "a2ec03d6c98c9718e55e35d59406c605",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='YWSi-0' random-id='7e724748-935e-77c5-5c6c-5c40d4d08bb9'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;Llama3Simplified&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "zlud",
+      "code_hash": "126fedc8a9fe5f412b24eb9c81ae44ff",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "xvXZ",
+      "code_hash": "140c8ecf6e8391a60207df9fe16ec4af",
+      "outputs": [
+        {
+          "type": "error",
+          "ename": "exception",
+          "evalue": "'Llama3Simplified' object has no attribute 'embedding'",
+          "traceback": []
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stderr",
+          "text": "Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n",
+          "mimetype": "text/plain"
+        },
+        {
+          "type": "stream",
+          "name": "stderr",
+          "text": "<span class=\"codehilite\"><div class=\"highlight\"><pre><span></span><span class=\"gt\">Traceback (most recent call last):</span>\n  File <span class=\"nb\">&quot;/var/folders/w2/5g3ht4h93vqb3l6zf_5hv6w40000gp/T/marimo_39347/__marimo__cell_xvXZ_.py&quot;</span>, line <span class=\"m\">32</span>, in <span class=\"n\">&lt;module&gt;</span>\n<span class=\"w\">    </span><span class=\"n\">model</span><span class=\"o\">.</span><span class=\"n\">load_llama_weights</span><span class=\"p\">(</span><span class=\"n\">checkpoint</span><span class=\"p\">)</span>\n<span class=\"w\">    </span><span class=\"pm\">~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^</span>\n  File <span class=\"nb\">&quot;/var/folders/w2/5g3ht4h93vqb3l6zf_5hv6w40000gp/T/marimo_39347/__marimo__cell_mWxS_.py&quot;</span>, line <span class=\"m\">40</span>, in <span class=\"n\">load_llama_weights</span>\n<span class=\"w\">    </span><span class=\"bp\">self</span><span class=\"o\">.</span><span class=\"n\">embedding</span><span class=\"o\">.</span><span class=\"n\">weight</span><span class=\"o\">.</span><span class=\"n\">data</span> <span class=\"o\">=</span> <span class=\"n\">checkpoint</span><span class=\"p\">[</span><span class=\"s2\">&quot;tok_embeddings.weight&quot;</span><span class=\"p\">]</span>\n<span class=\"w\">    </span><span class=\"pm\">^^^^^^^^^^^^^^</span>\n  File <span class=\"nb\">&quot;/Users/aagrawal/.cache/uv/archive-v0/hl1VE-D0oAPjdhhxp6k7f/lib/python3.14/site-packages/torch/nn/modules/module.py&quot;</span>, line <span class=\"m\">1965</span>, in <span class=\"n\">__getattr__</span>\n<span class=\"w\">    </span><span class=\"k\">raise</span> <span class=\"ne\">AttributeError</span><span class=\"p\">(</span>\n<span class=\"w\">    </span>    <span class=\"sa\">f</span><span class=\"s2\">&quot;&#39;</span><span class=\"si\">{</span><span class=\"nb\">type</span><span class=\"p\">(</span><span class=\"bp\">self</span><span class=\"p\">)</span><span class=\"o\">.</span><span class=\"vm\">__name__</span><span class=\"si\">}</span><span class=\"s2\">&#39; object has no attribute &#39;</span><span class=\"si\">{</span><span class=\"n\">name</span><span class=\"si\">}</span><span class=\"s2\">&#39;&quot;</span>\n<span class=\"w\">    </span><span class=\"p\">)</span>\n<span class=\"gr\">AttributeError</span>: <span class=\"n\">&#39;Llama3Simplified&#39; object has no attribute &#39;embedding&#39;</span>\n</pre></div>\n</span>",
+          "mimetype": "application/vnd.marimo+traceback"
+        }
+      ]
+    },
+    {
+      "id": "CLip",
+      "code_hash": "7c292b015daf3c77dc7914a741bd84bc",
+      "outputs": [
+        {
+          "type": "error",
+          "ename": "exception",
+          "evalue": "An ancestor raised an exception (AttributeError): ",
+          "traceback": []
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "YECM",
+      "code_hash": "c19254a615f9b81c6c360d4d729e5cbc",
+      "outputs": [
+        {
+          "type": "error",
+          "ename": "exception",
+          "evalue": "An ancestor raised an exception (AttributeError): ",
+          "traceback": []
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "cEAS",
+      "code_hash": "458dfda7d3ab09e23f5876bbefb64c4d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='cEAS-0' random-id='556c0982-4a3e-5ed2-7742-818bc1304bc1'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;eval_llama3&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "iXej",
+      "code_hash": "f9f93762f569a3144b3944a0b6f437d5",
+      "outputs": [
+        {
+          "type": "error",
+          "ename": "exception",
+          "evalue": "An ancestor raised an exception (AttributeError): ",
+          "traceback": []
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "UmEG",
+      "code_hash": "00eb746125e1d2c8a1752d5e68367bbd",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vEBW",
+      "code_hash": "0e4951537c266ecc672562c0c3283057",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "\u001b[31mF\u001b[0m\u001b[31m                                                                        [100%]\u001b[0m\n=================================== FAILURES ===================================\n\u001b[31m\u001b[1m___________________________ .hw4.test_generate_local ___________________________\u001b[0m\n\n    def test_generate_local():\n>       test_generate(generate)\n\n\u001b[1m\u001b[31mmarimo://hw4.py#cell_id=cell\u001b[0m:2: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\ngenerate = <function generate at 0x116d6fc10>\n\n    def test_generate(generate):\n        model = _ToyModel([3, 4])\n        tokenizer = _ToyTokenizer(stop_tokens={4})\n    \n        out = io.StringIO()\n        with redirect_stdout(out):\n            generated = generate(model, [1, 2], tokenizer, temp=0.7, max_tokens=5, verbose=True)\n    \n>       assert(generated == [3, 4])\n               ^^^^^^^^^^^^^^^^^^^\n\u001b[1m\u001b[31mE       AssertionError\u001b[0m\n\n\u001b[1m\u001b[31mhw4_tests.py\u001b[0m:602: AssertionError\n=================================== Overview ===================================\n\nSummary:\nTotal: 1, Passed: 0, Failed: 1, Errors: 0, Skipped: 0\n\u001b[36m\u001b[1m=========================== short test summary info ============================\u001b[0m\n\u001b[31mFAILED\u001b[0m .::\u001b[1mtest_generate_local\u001b[0m - AssertionError\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "kLmu",
+      "code_hash": "0fcc83d6e865effd15c7e0cc01088f79",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='kLmu-0' random-id='58e78a77-a371-2fde-7ef2-729d60ff992a'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;submit &lt;code&gt;generate&lt;/code&gt;&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "IpqN",
+      "code_hash": "7495941f39aca5f141aa7c73414e9e64",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "dlnW",
+      "code_hash": "0d58002d5054ddab92d561c47a5e1ab8",
+      "outputs": [
+        {
+          "type": "error",
+          "ename": "exception",
+          "evalue": "An ancestor raised an exception (AttributeError): ",
+          "traceback": []
+        }
+      ],
+      "console": []
+    }
+  ]
+}
