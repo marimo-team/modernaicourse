@@ -39,8 +39,10 @@ Each concept notebook is associated with a lecture.
 
 | Lecture | Notebook |
 | ------- | ---------- |
-| [Lecture 2: Intro to supervised machine learning](https://www.youtube.com/watch?v=xIQkf7ZGQhM) | [![Open in molab](https://marimo.io/molab-shield.svg)](https://molab.marimo.io/github/marimo-team/modernaicourse/blob/main/concepts/02_supervised_learning.py)
-| [Lecture 3: Linear Algebra](https://youtu.be/tlbLH77GFLQ?si=3DSmmVXzqxIJrHUP) | [![Open in molab](https://marimo.io/molab-shield.svg)](https://molab.marimo.io/github/marimo-team/modernaicourse/blob/main/concepts/03_linear_algebra.py)
+| [Intro to supervised machine learning](https://www.youtube.com/watch?v=xIQkf7ZGQhM) | [![Open in molab](https://marimo.io/molab-shield.svg)](https://molab.marimo.io/github/marimo-team/modernaicourse/blob/main/concepts/02_supervised_learning.py)
+| [Linear Algebra](https://youtu.be/tlbLH77GFLQ?si=3DSmmVXzqxIJrHUP) | [![Open in molab](https://marimo.io/molab-shield.svg)](https://molab.marimo.io/github/marimo-team/modernaicourse/blob/main/concepts/03_linear_algebra.py)
+| [Self-attention](youtube.com/watch?v=fxxDBiIvGDw&feature=youtu.be) | [![Open in molab](https://marimo.io/molab-shield.svg)](https://molab.marimo.io/github/marimo-team/modernaicourse/blob/main/concepts/self_attention.py)
+| [Multi-head attention](youtube.com/watch?v=fxxDBiIvGDw&feature=youtu.be) | [![Open in molab](https://marimo.io/molab-shield.svg)](https://molab.marimo.io/github/marimo-team/modernaicourse/blob/main/concepts/multihead_attention.py)
 
 ## Homework
 
@@ -49,6 +51,9 @@ Each concept notebook is associated with a lecture.
 - [HW 2: Automatic differentiation and training a linear model](https://molab.marimo.io/github/marimo-team/modernaicourse/blob/main/homework/hw2/hw2.py)
 - [HW 3: Training a neural network](https://molab.marimo.io/github/marimo-team/modernaicourse/blob/main/homework/hw3/hw3.py)
 - [HW 4: Implementing a transformer](https://molab.marimo.io/github/marimo-team/modernaicourse/blob/main/homework/hw4/hw4.py)
+- [HW 5: Training an LLM](https://molab.marimo.io/github/marimo-team/modernaicourse/blob/main/homework/hw5/hw5.py)
+- [HW 6: Supervised finetuning for chat and DPO](https://molab.marimo.io/github/marimo-team/modernaicourse/blob/main/homework/hw6/hw6.py)
+- [HW 7: Reasoning models and reinforcement learning](https://molab.marimo.io/github/marimo-team/modernaicourse/blob/main/homework/hw7/hw7.py)
 
 ## About the course
 
