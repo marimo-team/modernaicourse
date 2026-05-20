@@ -1,5 +1,4 @@
 # /// script
-# requires-python = ">=3.14"
 # dependencies = [
 #     "matplotlib==3.10.8",
 #     "marimo",

@@ -1,5 +1,4 @@
 # /// script
-# requires-python = ">=3.14"
 # dependencies = [
 #     "marimo",
 #     "numpy==2.4.1",
