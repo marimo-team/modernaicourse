@@ -85,7 +85,7 @@ def _():
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
-    ### Question 1 - Linear Layer
+    ### Question 1: Linear Layer
 
     Implement a `Linear` layer, similar to the one from Homework 3, but using `torch.empty()` instead of `torch.randn()` to initialize the weight. The weight should be stored as a `Parameter` of shape `(out_dim, in_dim)` called `.weight`. The forward pass computes $XW^T$.
     """)
@@ -147,7 +147,7 @@ def _(submit_Linear_button):
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
-    ### Question 2 - Embedding Layer
+    ### Question 2: Embedding Layer
 
     Implement an `Embedding` layer that converts token indices to dense vectors. The layer stores a `.weight` Parameter of shape `(num_tokens, dim)`, initialized with `torch.empty()`. The forward pass indexes into the weight matrix to retrieve embeddings for the given token indices.
     """)
@@ -209,7 +209,7 @@ def _(submit_Embedding_button):
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
-    ### Question 3 - SiLU Nonlinearity
+    ### Question 3: SiLU Nonlinearity
 
     Implement the SiLU (Sigmoid Linear Unit) activation function, defined as:
 
@@ -254,7 +254,7 @@ def _(submit_silu_button):
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
-    ### Question 4 - RMS Norm
+    ### Question 4: RMS Norm
 
     Implement RMS (Root Mean Square) Normalization. Given an input $X \in \mathbb{R}^{n \times d}$ and a learnable weight $w \in \mathbb{R}^d$, RMSNorm is defined as:
 
@@ -320,7 +320,7 @@ def _(submit_RMSNorm_button):
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
-    ### Question 5 - Masked Self Attention
+    ### Question 5: Masked Self Attention
 
     Implement scaled dot-product self attention. Given queries $Q$, keys $K$, and values $V$, and an optional mask, self attention is computed as:
 
@@ -370,7 +370,7 @@ def _(submit_self_attention_button):
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
-    ### Question 6 - Multi-head Attention (no caching)
+    ### Question 6: Multi-head Attention (no caching)
 
     Implement multi-head attention with the following steps:
 
@@ -446,7 +446,7 @@ def _(submit_MultiHeadAttention_button):
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
-    ### Question 6 (cont.) - Multi-head Attention with KV Cache
+    ### Question 6 (cont.): Multi-head Attention with KV Cache
 
     Now implement multi-head attention with KV caching. The KV cache stores previously computed keys and values so that during autoregressive generation, we only need to compute Q, K, V for the new tokens, then concatenate K and V with the cached values.
 
@@ -526,7 +526,7 @@ def _(submit_MultiHeadAttentionKVCache_button):
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
-    ### Question 7 - Gated MLP
+    ### Question 7: Gated MLP
 
     Implement the Gated MLP (as used in Llama), defined as:
 
@@ -592,7 +592,7 @@ def _(submit_GatedMLP_button):
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
-    ### Question 8 - Transformer Block
+    ### Question 8: Transformer Block
 
     Implement a single Transformer block with pre-norm residual connections:
 
@@ -668,7 +668,7 @@ def _(submit_TransformerBlock_button):
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
-    ### Question 9 - Llama3 Model
+    ### Question 9: Llama3 Model
 
     Implement the full Llama 3 simplified model. The model consists of:
 
@@ -870,7 +870,7 @@ def _(eval_llama3, submit_eval_llama3_button):
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
-    ### Question 10 - Generation
+    ### Question 10: Generation
 
     Implement autoregressive text generation with KV caching. Given a model, a list of prompt tokens, and a tokenizer:
 

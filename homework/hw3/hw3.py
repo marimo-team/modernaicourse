@@ -95,7 +95,7 @@ def _():
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
-    ### Question 1. Linear layer
+    ### Question 1: Linear layer
 
     Implement a linear layer as a `Module` subclass.  The layer should have a single `.weight` parameter (a `Parameter` object) of shape `out_dim x in_dim`.  The weight should be initialized to random Gaussian values scaled by $\sqrt{2 / \text{in\_dim}}$ (i.e., `torch.randn(out_dim, in_dim) * math.sqrt(2 / in_dim)`).
 
@@ -155,7 +155,7 @@ def _(submit_Linear_button):
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
-    ### Question 2 - Cross entropy loss
+    ### Question 2: Cross entropy loss
 
     Implement the cross entropy loss as a PyTorch `Module`.  Recall that the cross entropy loss is defined as
 
@@ -212,7 +212,7 @@ def _(submit_CrossEntropyLoss_button):
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
-    ### Question 3 - Stochastic Gradient Descent
+    ### Question 3: Stochastic Gradient Descent
 
     Implement a simple SGD optimizer.  In PyTorch, the general paradigm for optimizers is as follows:
 
@@ -284,7 +284,7 @@ def _(submit_SGD_button):
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
-    ### Question 4 - Data Loader
+    ### Question 4: Data Loader
 
     Implement a simple data loader class that iterates over a dataset in batches.  The class should implement the Python iterator protocol using `__iter__` and `__next__` methods.
 
@@ -353,7 +353,7 @@ def _(submit_DataLoader_button):
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
-    ### Question 5 - Optimization epoch
+    ### Question 5: Optimization epoch
 
     Implement an `epoch` function that runs one pass over the data.  The function takes a model, a data loader, a loss function, and an optional optimizer.
 
@@ -403,10 +403,25 @@ def _(submit_epoch_button):
     return
 
 
+@app.function(hide_code=True)
+def train_model(model, train_dataloader, test_dataloader, lr, n_epochs=20):
+    """Train a model and return it along with final metrics."""
+    opt = SGD(model.parameters(), learning_rate=lr)
+    loss_fn = CrossEntropyLoss()
+    for _i in mo.status.progress_bar(range(n_epochs), title="Training"):
+        train_loss, train_err = epoch(model, train_dataloader, loss_fn, opt)
+        test_loss, test_err = epoch(model, test_dataloader, loss_fn)
+        print(
+            f"Train Loss: {train_loss:.4f}, Train Error: {train_err:.4f}, "
+            + f"Test Loss: {test_loss:.4f}, Test Error: {test_err:.4f}"
+        )
+    return model
+
+
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
-    If you implemented all the problems above correctly, then the following two cells of code will load the data, and train a linear model on the MNIST training set.
+    If you implemented all the problems above correctly, then the following cells will load the data and let you train a linear model on the MNIST training set. Click the button to start training.
     """)
     return
 
@@ -426,21 +441,19 @@ def _():
     return test_dataloader, train_dataloader
 
 
-@app.cell
-def _(test_dataloader, train_dataloader):
-    linear_model = Linear(784, 10)
-    linear_opt = SGD(linear_model.parameters(), learning_rate=0.2)
-    linear_loss = CrossEntropyLoss()
+@app.cell(hide_code=True)
+def _():
+    train_linear_button = mo.ui.run_button(label="Train linear model")
+    train_linear_button
+    return (train_linear_button,)
 
-    for _i in range(20):
-        _train_loss, _train_err = epoch(
-            linear_model, train_dataloader, linear_loss, linear_opt
-        )
-        _test_loss, _test_err = epoch(linear_model, test_dataloader, linear_loss)
-        print(
-            f"Train Loss: {_train_loss:.4f}, Train Error: {_train_err:.4f}, "
-            + f"Test Loss: {_test_loss:.4f}, Test Error: {_test_err:.4f}"
-        )
+
+@app.cell
+def _(train_linear_button, test_dataloader, train_dataloader):
+    mo.stop(not train_linear_button.value)
+    linear_model = train_model(
+        Linear(784, 10), train_dataloader, test_dataloader, lr=0.2
+    )
     return (linear_model,)
 
 
@@ -489,7 +502,7 @@ def _():
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
-    ### Question 6 - Two-layer neural network
+    ### Question 6: Two-layer neural network
 
     Implement a two-layer neural network as a `Module` subclass.  The network computes
 
@@ -549,26 +562,24 @@ def _(submit_TwoLayerNN_button):
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
-    After you have implemented the layer, the following code will train this model.
+    After you have implemented the layer, click the button below to train this model.
     """)
     return
 
 
-@app.cell
-def _(test_dataloader, train_dataloader):
-    nn_model = TwoLayerNN(784, 300, 10)
-    nn_opt = SGD(nn_model.parameters(), learning_rate=0.3)
-    nn_loss = CrossEntropyLoss()
+@app.cell(hide_code=True)
+def _():
+    train_nn_button = mo.ui.run_button(label="Train two-layer neural network")
+    train_nn_button
+    return (train_nn_button,)
 
-    for _i in range(20):
-        _train_loss, _train_err = epoch(
-            nn_model, train_dataloader, nn_loss, nn_opt
-        )
-        _test_loss, _test_err = epoch(nn_model, test_dataloader, nn_loss)
-        print(
-            f"Train Loss: {_train_loss:.4f}, Train Error: {_train_err:.4f}, "
-            + f"Test Loss: {_test_loss:.4f}, Test Error: {_test_err:.4f}"
-        )
+
+@app.cell
+def _(train_nn_button, test_dataloader, train_dataloader):
+    mo.stop(not train_nn_button.value)
+    nn_model = train_model(
+        TwoLayerNN(784, 300, 10), train_dataloader, test_dataloader, lr=0.3
+    )
     return (nn_model,)
 
 
@@ -609,7 +620,7 @@ def _(eval_two_layer_nn, submit_eval_two_layer_nn_button):
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
-    ### Question 7 - Multi-layer neural network
+    ### Question 7: Multi-layer neural network
 
     Implement an arbitrary-depth multi-layer neural network with ReLU activations.  The network computes
 
