@@ -41,8 +41,8 @@ Each concept notebook is associated with a lecture.
 | ------- | ---------- |
 | [Intro to supervised machine learning](https://www.youtube.com/watch?v=xIQkf7ZGQhM) | [![Open in molab](https://marimo.io/molab-shield.svg)](https://molab.marimo.io/github/marimo-team/modernaicourse/blob/main/concepts/02_supervised_learning.py)
 | [Linear Algebra](https://youtu.be/tlbLH77GFLQ?si=3DSmmVXzqxIJrHUP) | [![Open in molab](https://marimo.io/molab-shield.svg)](https://molab.marimo.io/github/marimo-team/modernaicourse/blob/main/concepts/03_linear_algebra.py)
-| [Self-attention](youtube.com/watch?v=fxxDBiIvGDw&feature=youtu.be) | [![Open in molab](https://marimo.io/molab-shield.svg)](https://molab.marimo.io/github/marimo-team/modernaicourse/blob/main/concepts/self_attention.py)
-| [Multi-head attention](youtube.com/watch?v=fxxDBiIvGDw&feature=youtu.be) | [![Open in molab](https://marimo.io/molab-shield.svg)](https://molab.marimo.io/github/marimo-team/modernaicourse/blob/main/concepts/multihead_attention.py)
+| [Self-attention](https://youtube.com/watch?v=fxxDBiIvGDw&feature=youtu.be) | [![Open in molab](https://marimo.io/molab-shield.svg)](https://molab.marimo.io/github/marimo-team/modernaicourse/blob/main/concepts/self_attention.py)
+| [Multi-head attention](https://youtube.com/watch?v=fxxDBiIvGDw&feature=youtu.be) | [![Open in molab](https://marimo.io/molab-shield.svg)](https://molab.marimo.io/github/marimo-team/modernaicourse/blob/main/concepts/multihead_attention.py)
 
 ## Homework
 
