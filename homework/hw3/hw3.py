@@ -1,4 +1,5 @@
 # /// script
+# requires-python = ">=3.14"
 # dependencies = [
 #     "marimo",
 #     "numpy==2.4.1",
@@ -61,17 +62,11 @@ def _():
     mo.md(r"""
     ## Homework 3 - Training models in PyTorch
 
-    In this homework, you will implement the basic components of training ML models in PyTorch.  Unlike in the previous homework where you implemented the gradient computation manually and wrote your own training loop "from scratch" (in the sense that you didn't use modules, optimizers, etc), this homework will implement the more "standard" approach to training models in PyTorch.  Specifically, you will implement the following components:
+    In this homework, we'll start to build and train machine learning models (both a linear model a neural network) using PyTorch.  While a lot of the code you will develop here corresponds to existing implementations in the PyTorch `nn` module, you will implement almost everything from scratch in these assignments, rather than use pre-built layers.  Specifically you will use only the `Module`, and `Parameter` classes from PyTorch (later assignments will also use `ModuleList` and `Buffer`), and everything else should be implemented just with the calls included in the base `torch` library.
 
-    1. A `Linear` layer as a `Module` subclass
-    2. A `CrossEntropyLoss` module
-    3. A `SGD` optimizer
-    4. A `DataLoader` class
-    5. An `epoch` function that runs one pass over the data
+    ***Important:*** **To be very explicit, you solutions in this, and all later problem sets, should _not_ use any classes or functions from within the `torch.nn` module, nor function calls from the `torch.nn.functional` module.  You should only use calls available in the base `torch.` module.**
 
-    You will then use these components to train a linear model on the MNIST dataset, and then extend this to train a two-layer and multi-layer neural network.
-
-    **Important**: For this assignment, you should use the `Module` and `Parameter` classes from `torch.nn`, but you should _not_ use any of the built-in layer, loss, or optimizer implementations from `torch.nn` or `torch.optim` (i.e., don't use `torch.nn.Linear`, `torch.nn.CrossEntropyLoss`, `torch.optim.SGD`, etc.).  The goal is for you to implement these yourself using only basic PyTorch tensor operations.
+    If you are curious, you can look at the `hw3_tests.py` file to see how we evaluate these tests, where (in the `test_` functions), we essentially are comparing the methods to the equivalent PyTorch operations.  This illustrates how your own methods implementations are exactly mirroring those in PyTorch.
     """)
     return
 
@@ -86,7 +81,9 @@ def _():
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
-    ## Part I. Training a linear model
+    ## Part I - Training a linear model
+
+    To begin, we'll implement a linear model trained via (stochastic) gradient descent, and then use it to train a classifier for the same MNIST digit prediction task you completed in the last homework.  The only significant difference is that we are going to implement all of this in an idiomatic PyTorch fashion.
     """)
     return
 
@@ -94,26 +91,34 @@ def _():
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
-    ### Question 1: Linear layer
+    ### Question 1 - Linear layer
 
-    Implement a linear layer as a `Module` subclass.  The layer should have a single `.weight` parameter (a `Parameter` object) of shape `out_dim x in_dim`.  The weight should be initialized to random Gaussian values scaled by $\sqrt{2 / \text{in\_dim}}$ (i.e., `torch.randn(out_dim, in_dim) * math.sqrt(2 / in_dim)`).
+    As a first exercise, implement a linear layer in PyTorch.  We in fact did this in class, so you can largely use the example there, but it might help to have a review of the important elements here.  Here are the key points about implementing such a linear layer.
 
-    The forward pass should compute the matrix multiplication $X W^T$ where $X$ is the input and $W$ is the weight matrix.  Note that this should work for inputs of arbitrary batch dimensions (e.g., both 2D inputs of shape `(batch, in_dim)` and 3D inputs of shape `(batch1, batch2, in_dim)` should be supported).  You can use the `@` operator for matrix multiplication, which handles broadcasting automatically.
+    - All PyTorch layers are implemented as a subclasses of the `Module` class.  This class implements a few things: 1) it lets you instatiate layers as class instances, and apply these layers to inputs or intermediate units in the network; 2) it encapsulates the parameters of that layer (e.g., the weights that you will be training), and recursively tracks parameters of any module included in the class.
+    - The `Parameter` class is a simple wrapper you can provide apply to a tensor within that class, such that the layer will track these parameters (in any layer that includes it), and compute gradients of the parameters by default.
+    - Generally, you need to implement two functions in a module class: the `__init__()` function and the `forward()` function.  The former is called to initialize your layer, set up the parameters, etc, and the latter is called when you apply the layer to some input.
+
+    For the linear layer in particular:
+
+    - You should store the weights is a `.weight` Parameter in the class, which should be an `out_dim x in_dim` dimensional tensor.  You should initialize with the $\sqrt{2/\text{in\_dim}}$ scaling of random Gaussian weights that we discussed in class.
+    - The forward call always takes a batch of examples, i.e. a `batch_size x in_dim` tensor, and should return a `batch_size x out_dim` tensor.
+
+    Remember, do _not_ use the `nn.Linear` layer in PyTorch, but rather you should implement this just using functions available in the top-level `torch` library.
     """)
     return
 
 
 @app.class_definition
 class Linear(Module):
-    """
-    A linear layer module that computes X @ W^T.
-
-    Attributes:
-        weight: Parameter of shape (out_dim, in_dim) initialized with
-                Kaiming-style scaling sqrt(2/in_dim).
-    """
-
     def __init__(self, in_dim, out_dim):
+        """
+        Initialize a linear layer with Gaussian weights scaled by sqrt(2/in_dim).
+
+        Inputs:
+            in_dim : int - input feature dimension
+            out_dim : int - output feature dimension
+        """
         super().__init__()
         ### BEGIN YOUR CODE
         pass
@@ -121,12 +126,12 @@ class Linear(Module):
 
     def forward(self, X):
         """
-        Compute the forward pass of the linear layer.
+        Apply the linear layer to one or more input vectors.
 
         Input:
-            X: torch.Tensor of shape (..., in_dim)
+            X : torch.Tensor[float] (batch_size x in_dim) - input tensor
         Output:
-            torch.Tensor of shape (..., out_dim)
+            torch.Tensor[float] (batch_size x out_dim) - transformed tensor
         """
         ### BEGIN YOUR CODE
         pass
@@ -154,32 +159,24 @@ def _(submit_Linear_button):
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
-    ### Question 2: Cross entropy loss
+    ### Question 2 - Cross entropy loss
 
-    Implement the cross entropy loss as a PyTorch `Module`.  Recall that the cross entropy loss is defined as
-
-    $$L_{ce}(\hat{y}, y) = \frac{1}{N} \sum_{i=1}^N \left ( -\hat{y}_{i,y_i} + \log \sum_{j=1}^k \exp \hat{y}_{i,j} \right )$$
-
-    where $\hat{y} \in \mathbb{R}^{N \times k}$ are the logits and $y \in \{0,\ldots,k-1\}^N$ are the targets.  You can use `torch.logsumexp` to compute the log-sum-exp term for numerical stability.
+    Implement cross entropy loss as a PyTorch module.  This function likely doesn't really need to be a layer (a function would be fine), but it's a common enough to also use a module (e.g., there is the `nn.CrossEntropyLoss` module in PyTorch, though of course you should not use this).  Given a `batch_size x k` real-valued tensor `logits`, where the predicted outputs for each example are stored in the rows, and a `batch_size` dimensional tensor of integer values `y` denoted the desired discrete outputs, the `forward()` method of the function should return the average cross entropy loss.
     """)
     return
 
 
 @app.class_definition
 class CrossEntropyLoss(Module):
-    """
-    Cross entropy loss module.
-    """
-
     def forward(self, logits, y):
         """
-        Compute the cross entropy loss.
+        Compute average cross entropy loss over a minibatch.
 
-        Input:
-            logits: torch.Tensor of shape (N, k) - predicted logits
-            y: torch.Tensor of shape (N,) - target class indices
+        Inputs:
+            logits : 2D torch.Tensor[float] (N x k) - predicted logits for each example
+            y : 1D torch.Tensor[int] (N) - desired class for each example
         Output:
-            scalar torch.Tensor - average cross entropy loss
+            scalar torch.Tensor[float] - average cross entropy loss
         """
         ### BEGIN YOUR CODE
         pass
@@ -211,35 +208,44 @@ def _(submit_CrossEntropyLoss_button):
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
-    ### Question 3: Stochastic Gradient Descent
+    ### Stochastic Gradient Descent
 
-    Implement a simple SGD optimizer.  In PyTorch, the general paradigm for optimizers is as follows:
+    Next, you'll implement stochastic gradient descent as a class similar to the analogous class in the PyTorch.  This is not at `Module` class, and in fact rather than subclass the analogous `Optimizer` class in PyTorch, we'll just define the class directly, and use a similar interface to what PyTorch uses in its optimizers.
 
-    1. Create an optimizer object, passing it the parameters of the model you want to optimize and a learning rate.
-    2. In the training loop, you call `opt.zero_grad()` to zero out all gradients, compute the loss, call `loss.backward()` to compute gradients, and then call `opt.step()` to update the parameters.
+    In the standard optimizer paradigm of PyTorch, an optimizer is used like the following:
+    ```python
+    ### initialization
+    opt = Optimizer(model.parameters(), *optimizer_settings)
 
-    The `SGD` class should implement this interface.  A few important notes:
+    ### in your training loop:
+    # compute loss
+    opt.zero_grad()
+    loss.backward()
+    opt.step()
+    ```
+    When initializing the optimizer, you pass the model parameters it should be optimizing, usually from the `.parameters()` call of your final model `Module`, plus any other settings like step size for the optimizer.  Then, during optimization, you first call `.zero_grad()`, which zeros out all the `.grad` variables (if they exist) of all the parameters, then compute the gradients using PyTorch's automatic differentiation (called via the `.backward()` ), and call the optimizer's `.step()` function, which modifies the parameters with the optimization update, e.g. a gradient descent step.
 
-    - In `__init__`, you should store the parameters as a **list** (i.e., call `list()` on the parameters generator).  This is because `model.parameters()` returns a generator, and you need to iterate over it multiple times.
-    - In `step()`, you should update each parameter's `.data` attribute (not the parameter itself) using `torch.no_grad()` context manager, or alternatively just modify `.data` directly, since modifying `.data` doesn't track gradients.
-    - In `zero_grad()`, you should set each parameter's `.grad` to `None`.
+    Implement these operations in the class below.  There are a few pitfalls to keep in mind:
+
+    - In your `__init__` function, you should explicitly call `list()` on the `parameters` input to store it in your class.  This is because the `model.parameters()` function returns a Python generator, an object that can be iterated over _one_ time to return all its elements.  So if you only store the passed `parameters` variable and then try to iterate over it during your `zero_grad` or `step` functions, you will only iterate over the parameters one time, and thereafter there won't be any elements to iterate over.
+    - You need to compute the updates to the parameters within a `torch.no_grad()` block, as shown below.  The reason for this is that otherwise, the gradient update will happen _within a automatic differentiation loop itself_, i.e., you will be computing the gradient of the entire chain of parameter updates you perform with gradient descent.  There are actually some very cool reasons why it's often useful to differentiate through an entire parameter update, but that is definitely not what we want here.
+    ```python
+    with torch.no_grad():
+        ### parameter update here
+    ```
     """)
     return
 
 
 @app.class_definition
 class SGD:
-    """
-    Stochastic Gradient Descent optimizer.
-    """
-
     def __init__(self, parameters, learning_rate):
         """
-        Initialize SGD optimizer.
+        Initialize an SGD optimizer over a set of model parameters.
 
-        Input:
-            parameters: iterable of Parameters to optimize
-            learning_rate: float - step size for parameter updates
+        Inputs:
+            parameters : iterable[torch.nn.Parameter] - parameters to optimize
+            learning_rate : float - gradient descent step size
         """
         ### BEGIN YOUR CODE
         pass
@@ -247,7 +253,7 @@ class SGD:
 
     def step(self):
         """
-        Update all parameters using their gradients.
+        Apply one SGD update to all stored parameters.
         """
         ### BEGIN YOUR CODE
         pass
@@ -255,7 +261,7 @@ class SGD:
 
     def zero_grad(self):
         """
-        Zero out gradients for all parameters.
+        Zero out gradients for all stored parameters when gradients exist.
         """
         ### BEGIN YOUR CODE
         pass
@@ -283,31 +289,39 @@ def _(submit_SGD_button):
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
-    ### Question 4: Data Loader
+    ### Question 4 - Data Loader
 
-    Implement a simple data loader class that iterates over a dataset in batches.  The class should implement the Python iterator protocol using `__iter__` and `__next__` methods.
+    Finally, you'll implement what's known as a DataLoader for your problem.  In idiomatic PyTorch, a data loader is a class that you can iterate over to get all the minibatches of a dataset.  You can use one with code that looks something like that following (there's slight differences when it comes to how to initialize the data loader from a dataset, and you'll have to write another once when considering LLMs, but this is the basic approach).
 
-    - `__init__` should store the data, labels, and batch size, and initialize any state needed for iteration.
-    - `__iter__` should reset the iteration state and return `self` (so the loader can be used in a `for` loop and can be iterated multiple times).
-    - `__next__` should return the next batch of `(X_batch, y_batch)` as a tuple.  When there are no more batches, it should raise `StopIteration`.  The last batch may be smaller than `batch_size` if the dataset size is not evenly divisible.
+    ```python
+    ### initialize data loader, where X_full and y_full are complete dataset
+    loader = DataLoader(X_full, y_full, batch_size=100)
+
+    ### to iterate over the dataset
+    for X,y in loader:
+        ### X,y contain each sequential sequential from X_full,y_full
+    ```
+
+    You have to implement this using what's known as a Python iterator.  This is a somewhat complex topic, and we won't cover iterators in generality at all, you just have to know the following.  In addition to the `__init__` routine, you need to implement two functions:
+
+    - `__iter__()` resets the iteration (i.e., somehow indicates that we are in minibatch number 0), and returns the class object `self`
+    - `__next__()` returns the current minibatch and increments the minibatch counter.  If there are no minibatches left, it calls `raise StopIteration`
+
+    You can read more about Python iterators [here](https://www.w3schools.com/python/python_iterators.asp).
     """)
     return
 
 
 @app.class_definition
 class DataLoader:
-    """
-    Simple data loader that iterates over a dataset in batches.
-    """
-
     def __init__(self, X, y, batch_size=100):
         """
-        Initialize the data loader.
+        Initialize a simple sequential minibatch data loader.
 
-        Input:
-            X: torch.Tensor - input data
-            y: torch.Tensor - labels
-            batch_size: int - number of examples per batch
+        Inputs:
+            X : 2D torch.Tensor[float] - (N x n) full input dataset
+            y : 1D torch.Tensor[int] - (N elements) full set of desired outputs
+            batch_size : int - number of examples per minibatch
         """
         ### BEGIN YOUR CODE
         pass
@@ -315,7 +329,10 @@ class DataLoader:
 
     def __iter__(self):
         """
-        Reset iteration state and return self.
+        Reset iteration state and return the iterator object.
+
+        Output:
+            DataLoader - iterator over minibatches
         """
         ### BEGIN YOUR CODE
         pass
@@ -323,8 +340,10 @@ class DataLoader:
 
     def __next__(self):
         """
-        Return next batch of (X_batch, y_batch).
-        Raises StopIteration when no more batches.
+        Return the next minibatch or raise StopIteration when exhausted.
+
+        Output:
+            tuple(torch.Tensor, torch.Tensor) - next (X_batch, y_batch)
         """
         ### BEGIN YOUR CODE
         pass
@@ -352,16 +371,26 @@ def _(submit_DataLoader_button):
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
-    ### Question 5: Optimization epoch
+    ### Optimization epoch
 
-    Implement an `epoch` function that runs one pass over the data.  The function takes a model, a data loader, a loss function, and an optional optimizer.
+    Finally, let's implement a routine that actually runs an epoch of optimization on a given dataset.  It's convenient (though we'll change this a bit when we do LLM training, since that it typically run single-epoch) to implement an `epoch()` function that carries out a single pass over the data, because this can be used both perform one epoch of optimization on the training set _and_ to compute test loss/error on a held out test set (making sure we don't actually run the optimization then).
 
-    - If `opt` is provided (training mode): for each batch, zero the gradients, compute the model output, compute the loss, call `loss.backward()`, and take an optimizer step.
-    - If `opt` is `None` (evaluation mode): for each batch, compute the model output and loss without computing or updating gradients (use `torch.no_grad()`).
+    Implement the function below.  This function takes three arguments a model, a loader, a loss, and an (optional) optimizer.  An example usage would be:
+    ```python
+    model = Linear(n,k)
+    loader = DataLoader(X_full,y_full)
+    loss = CrossEntropyLoss()
+    opt = SGD(model.parameters(), learning_rate=0.1)
+    avg_loss, avg_error = epoch(model, loader, loss, opt) # or without opt if just evaluating
+    ```
+    The basic approach to implement is as follows:
 
-    The function should return the average loss and average error rate over the entire dataset.  The error rate is the fraction of examples where the model's prediction (argmax of output) does not match the target.
+    - Iterate over all minibatches in the data loader
+    - For each minibatch, compute the model's predicted outputs and the loss between the predicted and desired outputs.
+    - If `opt` is not none, update the model parameters using the optimization
+    - Over the entire data loader, capture a running total of the total loss and total error over all samples, then return the average loss and average error.
 
-    **Important**: The average loss should be weighted by batch size (i.e., accumulate `loss * batch_size` and divide by total number of examples), and similarly for error.
+    Note that epoch needs to return the average loss and average error as _floats_ not as torch tensors.  You can use the `.item()` call on a scalar torch tensor to return the floating point value.
     """)
     return
 
@@ -369,15 +398,15 @@ def _():
 @app.function
 def epoch(model, loader, loss, opt=None):
     """
-    Run one epoch over the data.
+    Run one full pass through a dataset, with optional optimization.
 
-    Input:
-        model: Module - the model to train/evaluate
-        loader: iterable of (X_batch, y_batch) tuples
-        loss: Module - loss function
-        opt: SGD or None - optimizer (None for evaluation)
+    Inputs:
+        model : Module - model mapping inputs to logits
+        loader : iterable - yields minibatches (X, y)
+        loss : Module - loss function taking (logits, y)
+        opt : optimizer or None - if provided, run gradient updates each minibatch
     Output:
-        (avg_loss, avg_error): tuple of floats
+        tuple(float, float) - average loss and average error over the epoch
     """
     ### BEGIN YOUR CODE
     pass
@@ -420,7 +449,7 @@ def train_model(model, train_dataloader, test_dataloader, lr, n_epochs=20):
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
-    If you implemented all the problems above correctly, then the following cells will load the data and let you train a linear model on the MNIST training set. Click the button to start training.
+    If you implemented all the problems above correctly, then the following cells of code will load the data, and train a linear model on the MNIST training set (click the button to start training).  You can then use the submit button below to evaluate the learned model.
     """)
     return
 
@@ -494,33 +523,27 @@ def _(eval_linear_model, submit_eval_linear_model_button):
 def _():
     mo.md(r"""
     ## Part II - Training Neural Networks
-    """)
-    return
 
+    Now that you have the basic scaffolding for training a linear model in PyTorch, one of the nice features of this kind of modular framework, is that it is quite easy to extend this to train other models, just by swapping in a different model (i.e., a different Module subclass instance) as the `model` parameter in `epoch()`.  As an illustration, implement next a two layer neural network.  This should consist of two linear layers, stored as members `.linear1` and `.linear2` in the class, of the appropriate dimensions.  The network should implement the model
 
-@app.cell(hide_code=True)
-def _():
-    mo.md(r"""
-    ### Question 6: Two-layer neural network
+    $$h(x) = W_2 \sigma(W_1x)$$
 
-    Implement a two-layer neural network as a `Module` subclass.  The network computes
-
-    $$h(x) = W_2 \sigma(W_1 x)$$
-
-    where $\sigma$ is the ReLU activation function, $W_1 \in \mathbb{R}^{\text{hidden\_dim} \times \text{in\_dim}}$ and $W_2 \in \mathbb{R}^{\text{out\_dim} \times \text{hidden\_dim}}$.
-
-    You should use the `Linear` class you implemented above as the building block.  The network should have two attributes `self.linear1` and `self.linear2` that are `Linear` layers.  Use `torch.relu` (or equivalently `torch.clamp(x, min=0)`) for the ReLU activation.
+    where $\sigma$ is the ReLU nonlinearity, i.e., the two linear layers with a ReLU nonlinearity.  Be sure to make `.linear1` and `.linear2` instances of the `Linear` class you built above, rather than just storing their weights.  This is an important illustration of the value in using sublayers (if you stored the weights directly in the class, you would need, for instance, to rewrite the logic for initializing weights).
     """)
     return
 
 
 @app.class_definition
 class TwoLayerNN(Module):
-    """
-    Two-layer neural network: h(x) = W2 * relu(W1 * x)
-    """
-
     def __init__(self, in_dim, hidden_dim, out_dim):
+        """
+        Initialize a two-layer ReLU neural network.
+
+        Inputs:
+            in_dim : int - input feature dimension
+            hidden_dim : int - hidden layer dimension
+            out_dim : int - output feature dimension
+        """
         super().__init__()
         ### BEGIN YOUR CODE
         pass
@@ -528,12 +551,12 @@ class TwoLayerNN(Module):
 
     def forward(self, X):
         """
-        Compute the forward pass of the two-layer network.
+        Apply two linear layers with ReLU between them.
 
         Input:
-            X: torch.Tensor of shape (..., in_dim)
+            X : torch.Tensor[float] (batch_size x in_dim) - input tensor
         Output:
-            torch.Tensor of shape (..., out_dim)
+            torch.Tensor[float] (batch_size x out_dim) - output logits
         """
         ### BEGIN YOUR CODE
         pass
@@ -561,7 +584,7 @@ def _(submit_TwoLayerNN_button):
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
-    After you have implemented the layer, click the button below to train this model.
+    After you have implemented the layer, click the button below to train this model.  You should be able to achieve a test error less than 2% on MNIST.
     """)
     return
 
@@ -619,35 +642,27 @@ def _(eval_two_layer_nn, submit_eval_two_layer_nn_button):
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
-    ### Question 7: Multi-layer neural network
+    Finally, implement an arbitrary multi-layer neural network.  This would represent the multi-layer deep ReLU network
 
-    Implement an arbitrary-depth multi-layer neural network with ReLU activations.  The network computes
+    $$h(x) = W_{L} \sigma(W_{L-1} \sigma ( \ldots W_2 \sigma(W_1 x) \ldots))$$
 
-    $$h(x) = W_L \sigma(W_{L-1} \sigma(\cdots \sigma(W_1 x) \cdots))$$
+    where $\sigma$ again is the ReLU nonlinearity.
 
-    where $L$ is the number of layers and $\sigma$ is ReLU.  You should use `ModuleList` to store the list of `Linear` layers (this ensures that PyTorch can find all the parameters when you call `model.parameters()`).
-
-    The `hidden_dims` argument is a list of integers specifying the sizes of the hidden layers.  For example, `MultiLayerNN(784, 10, [300, 200])` would create a network with layers of sizes `784 -> 300 -> 200 -> 10`.
-
-    The network should have an attribute `self.linears` that is a `ModuleList` of `Linear` layers.
+    This class is initialized by passing the input and output dimensions, along with list of all hidden dimensions (i.e., the dimensionality of the inner activations in the network).  Your class should create a single `.linears` element which is a `ModuleList` of each `Linear` module of the appropriate size.
     """)
     return
 
 
 @app.class_definition
 class MultiLayerNN(Module):
-    """
-    Multi-layer neural network with ReLU activations.
-    """
-
     def __init__(self, in_dim, out_dim, hidden_dims):
         """
-        Initialize the multi-layer network.
+        Initialize a deep ReLU network with arbitrary hidden dimensions.
 
-        Input:
-            in_dim: int - input dimension
-            out_dim: int - output dimension
-            hidden_dims: list[int] - sizes of hidden layers
+        Inputs:
+            in_dim : int - input feature dimension
+            out_dim : int - output feature dimension
+            hidden_dims : list[int] - hidden layer widths in order
         """
         super().__init__()
         ### BEGIN YOUR CODE
@@ -656,12 +671,12 @@ class MultiLayerNN(Module):
 
     def forward(self, X):
         """
-        Compute the forward pass of the multi-layer network.
+        Apply all hidden linear layers with ReLU, then final linear output layer.
 
         Input:
-            X: torch.Tensor of shape (..., in_dim)
+            X : torch.Tensor[float] (batch_size x in_dim) - input tensor
         Output:
-            torch.Tensor of shape (..., out_dim)
+            torch.Tensor[float] (batch_size x out_dim) - output logits
         """
         ### BEGIN YOUR CODE
         pass
@@ -691,7 +706,7 @@ def _(submit_MultiLayerNN_button):
 @app.cell(hide_code=True)
 def _():
     mo.md(r"""
-    We won't require any further tests, but play around with a few different networks to see how low you can get the loss.  For example, you might try training a `MultiLayerNN` with different hidden layer configurations and learning rates.
+    We won't require any further tests, but play around with a few different networks to see how low you can get the loss (the lowest we have gotten is a test error of around 1.5%, but this winds up actually depending quite a bit on the random initialization).  Let us know what you get!
     """)
     return
 
