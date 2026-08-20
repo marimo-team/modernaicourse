@@ -1,9 +1,9 @@
 # /// script
 # dependencies = [
 #     "marimo",
-#     "numpy==2.4.1",
-#     "pytest==9.0.2",
-#     "requests==2.32.5",
+#     "numpy",
+#     "pytest",
+#     "requests",
 #     "mugrade @ git+https://github.com/locuslab/mugrade.git",
 # ]
 # ///
