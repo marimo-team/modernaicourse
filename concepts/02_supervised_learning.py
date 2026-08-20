@@ -1,11 +1,11 @@
 # /// script
 # dependencies = [
-#     "matplotlib==3.10.8",
+#     "matplotlib",
 #     "marimo",
-#     "numpy==2.4.1",
-#     "pillow==12.1.0",
-#     "polars==1.37.1",
-#     "torch==2.10.0",
+#     "numpy",
+#     "pillow",
+#     "polars",
+#     "torch",
 # ]
 # ///
 

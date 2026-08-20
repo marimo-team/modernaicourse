@@ -1,9 +1,9 @@
 # /// script
 # dependencies = [
 #     "marimo",
-#     "matplotlib==3.10.8",
-#     "numpy==2.4.1",
-#     "torch==2.10.0",
+#     "matplotlib",
+#     "numpy",
+#     "torch",
 #     "wigglystuff",
 # ]
 # ///
