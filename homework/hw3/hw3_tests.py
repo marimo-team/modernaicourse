@@ -151,6 +151,13 @@ def test_DataLoader(DataLoader):
         assert(torch.equal(Xb1, Xb2))
         assert(torch.equal(yb1, yb2))
 
+    loader = DataLoader(X, y, batch_size=4)
+    batches = list(loader)
+    assert(len(batches) == 3)
+    for i, (Xb, yb) in enumerate(batches):
+        assert(torch.equal(Xb, X[4*i:4*(i+1)]))
+        assert(torch.equal(yb, y[4*i:4*(i+1)]))
+
 
 def submit_DataLoader(DataLoader):
     X = torch.arange(14, dtype=torch.float32).reshape(7, 2)
